@@ -34,7 +34,7 @@ const captures = [
   ['privacy-mobile', '/de/datenschutz.html', { width: 390, height: 844 }]
 ];
 
-for (const slug of ["insights", "ki-pseudonymisierung", "anonymisierung-vs-pseudonymisierung", "personenbezogene-daten-ki", "geschaeftsgeheimnisse-ki", "ki-on-premises-private-cloud", "ki-vertragsanalyse", "ki-support-tickets", "ki-log-analyse"]) {
+for (const slug of ["insights", "ki-pseudonymisierung", "anonymisierung-vs-pseudonymisierung", "personenbezogene-daten-ki", "geschaeftsgeheimnisse-ki", "ki-on-premises-private-cloud", "ki-vertragsanalyse", "ki-support-tickets", "ki-log-analyse", "ki-finanzberichte", "ki-mitarbeiterfeedback", "ki-klinikverwaltung"]) {
   captures.push([slug + '-desktop', '/de/' + slug + '.html', {width:1440,height:900}]);
   captures.push([slug + '-mobile', '/de/' + slug + '.html', {width:390,height:844}]);
 }

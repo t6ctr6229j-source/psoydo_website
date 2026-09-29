@@ -22,3 +22,12 @@ a:focus-visible,button:focus-visible,[tabindex]:focus-visible{outline:2px solid 
 /* Separate, opt-in choices for statistics and advertising. */
 .consent-copy{display:block!important;flex:1}.consent-options{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:14px}.consent-options label{display:flex;gap:9px;align-items:center;font-size:13px;cursor:pointer}.consent-options input{width:18px;height:18px;accent-color:#5df5b8}.consent-actions{display:flex;flex-wrap:wrap;gap:10px;flex-shrink:0}.consent-actions button{min-height:44px}.site-footer #consent-reopen{margin:18px 0;font-size:12px;color:inherit;background:transparent;border:0;text-decoration:underline;cursor:pointer}
 
+
+/* Visible provider details, matching the existing dark footer. */
+.footer-contact{display:flex;justify-content:space-between;gap:24px;padding-top:24px;padding-bottom:24px;border-top:1px solid #425459;color:#d2ddd9;font-size:14px;line-height:1.8}
+.footer-contact address{font-style:normal;max-width:100%}
+.footer-contact strong{color:#f5f2eb}
+.footer-contact>div{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center}
+.footer-contact a{text-decoration:underline;text-underline-offset:4px}
+.footer-contact a:focus-visible{outline:2px solid #5df5b8;outline-offset:4px}
+@media(max-width:760px){.footer-contact{flex-direction:column;gap:14px}.footer-contact>div{flex-direction:column;align-items:flex-start}}

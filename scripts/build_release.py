@@ -12,7 +12,7 @@ from zipfile import ZipFile, ZIP_DEFLATED, ZipInfo
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'dist'
-ROOT_FILES = ['index.html', '404.html', 'styles.css', 'polish.css', 'v3.css',
+ROOT_FILES = ['.htaccess', 'index.html', '404.html', 'styles.css', 'polish.css', 'v3.css',
               'insights.css', 'pricing.css', 'technology.css', 'app.js', 'favicon.svg', 'og-image.png',
               'robots.txt', 'sitemap.xml']
 
