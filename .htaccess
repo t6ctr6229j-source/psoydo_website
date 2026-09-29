@@ -1,0 +1,12 @@
+# United Domains production routing. GitHub Pages ignores this file.
+RewriteEngine On
+# Root and explicit index aliases go straight to the canonical content URL.
+RewriteRule ^(?:index\.html)?$ https://psoydo.com/de/ [R=301,L]
+RewriteRule ^de$ https://psoydo.com/de/ [R=301,L]
+RewriteCond %{THE_REQUEST} \s/+de/index\.html[?\s] [NC]
+RewriteRule ^de/index\.html$ https://psoydo.com/de/ [R=301,L]
+# Preserve paths and query strings when normalizing the www hostname.
+RewriteCond %{HTTP_HOST} ^www\.psoydo\.com(?::[0-9]+)?$ [NC]
+RewriteRule ^ https://psoydo.com%{REQUEST_URI} [R=301,L,NE]
+# HTTPS is enforced by the hosting proxy; avoid a second proxy-dependent rule.
+ErrorDocument 404 /404.html

@@ -15,6 +15,7 @@ on:
       - 'scripts/**'
       - 'sitemap.xml'
       - 'robots.txt'
+      - '.htaccess'
       - 'og-image.svg'
       - '.github/workflows/website-qa.yml'
 
@@ -37,6 +38,13 @@ jobs:
           python-version: '3.12'
       - name: Static site QA
         run: python scripts/qa_site.py
+      - name: SEO semantics
+        run: python scripts/check_seo.py
+      - name: Production Apache routing
+        run: |
+          python scripts/build_release.py
+          if ! command -v apache2 >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y apache2; fi
+          python scripts/check_routes.py
       - name: JavaScript syntax
         run: node --check app.js
       - name: Start local site

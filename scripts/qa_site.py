@@ -21,7 +21,7 @@ PUBLIC_HTML = [
     ROOT / "de" / "datenschutz.html",
 ]
 NOINDEX_HTML = PUBLIC_HTML[7:]
-INSIGHTS_HTML = [ROOT / "de" / (slug + ".html") for slug in ['insights', 'ki-pseudonymisierung', 'anonymisierung-vs-pseudonymisierung', 'personenbezogene-daten-ki', 'geschaeftsgeheimnisse-ki', 'ki-on-premises-private-cloud', 'ki-vertragsanalyse', 'ki-support-tickets', 'ki-log-analyse']]
+INSIGHTS_HTML = [ROOT / "de" / (slug + ".html") for slug in ['insights', 'ki-pseudonymisierung', 'anonymisierung-vs-pseudonymisierung', 'personenbezogene-daten-ki', 'geschaeftsgeheimnisse-ki', 'ki-on-premises-private-cloud', 'ki-vertragsanalyse', 'ki-support-tickets', 'ki-log-analyse', 'ki-finanzberichte', 'ki-mitarbeiterfeedback', 'ki-klinikverwaltung']]
 PUBLIC_HTML += INSIGHTS_HTML
 INDEXABLE_HTML = [page for page in PUBLIC_HTML if page not in NOINDEX_HTML]
 

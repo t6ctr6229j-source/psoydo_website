@@ -202,3 +202,9 @@ The gate stays OPEN. Code/content quality, static QA, automated browser renderin
 - User requested continuing without an additional fingerprint secret. Public ED25519 key captured in unauthenticated GitHub run 35787312323 and pinned in deployment/ud-host.json (first-use trust, no provider confirmation claimed).
 - Deployment uses the existing three secrets plus optional port; [deploy-ud] on an approved main commit is an explicit release trigger alongside manual dispatch.
 - Actual SFTP upload and live domain validation still pending at this commit.
+
+## 2026-09-29 — SEO and industry content
+- Current user explicitly requested targeted implementation of the SEO/content brief. Based on current main 6d11f04, preserving the September 26 privacy release.
+- Added production routing, three industry articles, deeper existing core articles/Legal content, coherent publisher and net-pilot schema, visible provider contact and discovery links.
+- Added semantic SEO checks and real Apache routing tests; expanded browser coverage to 21 pages. No app.js or legal-main regression.
+- Source review and rich-result eligibility limitations documented in docs/SEO_RELEASE_2026-09-29.md. Pending PR/CI and deployment at this checkpoint.
