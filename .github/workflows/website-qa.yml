@@ -38,6 +38,8 @@ jobs:
           python-version: '3.12'
       - name: Static site QA
         run: python scripts/qa_site.py
+      - name: Check visible authorship and article dates
+        run: python scripts/check_authorship.py
       - name: SEO semantics
         run: python scripts/check_seo.py
       - name: Production Apache routing
@@ -129,3 +131,4 @@ jobs:
           if [ -f /tmp/psoydo-http.pid ]; then
             kill "$(cat /tmp/psoydo-http.pid)" || true
           fi
+

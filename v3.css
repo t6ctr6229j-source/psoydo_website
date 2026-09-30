@@ -4427,3 +4427,6 @@ body.lightbox-open{overflow:hidden}
 /* Editorial entry follows the warm pilot section. */
 .sub-cta.home-insights-entry{background:#e1e5dc}
 
+
+
+.content-detail{max-width:1000px}.content-detail p{font-size:17px;line-height:1.75;max-width:780px;margin:28px 0}.content-detail.sub-note{border-top:1px solid var(--v3-line);padding-top:26px;margin:36px 0}.content-detail.sub-note strong{font-family:var(--mono);font-size:12px}.content-detail + p{max-width:780px;font-size:17px;line-height:1.75}

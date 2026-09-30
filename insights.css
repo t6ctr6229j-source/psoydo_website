@@ -87,3 +87,7 @@
 
 .insights-industry{padding:0 0 80px}.insights-industry .insights-category{padding-top:0}
 @media(max-width:760px){.insights-industry{padding-bottom:46px}}
+
+
+/* Visible authorship and article dates share the same source as JSON-LD. */
+.author-credit{margin:24px 0 30px;padding:18px 0;border-top:1px solid currentColor;border-bottom:1px solid currentColor;max-width:78ch}.author-credit .author-credit-meta{font-size:14px;line-height:1.7;margin:0 0 8px}.author-credit .author-credit-bio{font-size:15px;line-height:1.65;margin:0;max-width:72ch}.author-credit a{text-decoration:underline;text-underline-offset:3px}.author-credit time{white-space:nowrap}@media(max-width:600px){.author-credit .author-credit-meta{font-size:12px}.author-credit .author-credit-bio{font-size:14px}}
