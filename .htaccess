@@ -1,5 +1,9 @@
 # United Domains production routing. GitHub Pages ignores this file.
 RewriteEngine On
+# Retired English pages have equivalent German successors. Keep unknown URLs as 404.
+RewriteRule ^en/?$ https://psoydo.com/de/ [R=301,L]
+RewriteRule ^en/index\.html$ https://psoydo.com/de/ [R=301,L]
+RewriteRule ^en/(datenschutz|impressum)\.html$ https://psoydo.com/de/$1.html [R=301,L]
 # Root and explicit index aliases go straight to the canonical content URL.
 RewriteRule ^(?:index\.html)?$ https://psoydo.com/de/ [R=301,L]
 RewriteRule ^de$ https://psoydo.com/de/ [R=301,L]

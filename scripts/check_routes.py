@@ -46,7 +46,7 @@ DirectoryIndex index.html
         for _ in range(30):
             try:opener.open('http://127.0.0.1:8091/de/',timeout=1);break
             except urllib.error.URLError:time.sleep(.1)
-        checks=[('/', 'psoydo.com',301,'https://psoydo.com/de/'),('/?source=test','www.psoydo.com',301,'https://psoydo.com/de/?source=test'),('/index.html','psoydo.com',301,'https://psoydo.com/de/'),('/de','www.psoydo.com',301,'https://psoydo.com/de/'),('/de/index.html','psoydo.com',301,'https://psoydo.com/de/'),('/de/ki-finanzberichte.html?x=1','www.psoydo.com',301,'https://psoydo.com/de/ki-finanzberichte.html?x=1'),('/de/','psoydo.com',200,None),('/missing/deep/path','psoydo.com',404,None)]
+        checks=[('/en/','psoydo.com',301,'https://psoydo.com/de/'),('/en/index.html','www.psoydo.com',301,'https://psoydo.com/de/'),('/en/datenschutz.html','psoydo.com',301,'https://psoydo.com/de/datenschutz.html'),('/en/impressum.html?source=old','psoydo.com',301,'https://psoydo.com/de/impressum.html?source=old'),('/en/not-a-page.html','psoydo.com',404,None),('/', 'psoydo.com',301,'https://psoydo.com/de/'),('/?source=test','www.psoydo.com',301,'https://psoydo.com/de/?source=test'),('/index.html','psoydo.com',301,'https://psoydo.com/de/'),('/de','www.psoydo.com',301,'https://psoydo.com/de/'),('/de/index.html','psoydo.com',301,'https://psoydo.com/de/'),('/de/ki-finanzberichte.html?x=1','www.psoydo.com',301,'https://psoydo.com/de/ki-finanzberichte.html?x=1'),('/de/','psoydo.com',200,None),('/missing/deep/path','psoydo.com',404,None)]
         for path,host,status,location in checks:
             req=urllib.request.Request('http://127.0.0.1:8091'+path,headers={'Host':host})
             try:response=opener.open(req)
