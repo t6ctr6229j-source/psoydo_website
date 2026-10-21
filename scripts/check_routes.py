@@ -18,7 +18,7 @@ with tempfile.TemporaryDirectory(prefix='psoydo-routing-') as folder:
     site=base/'site';site.mkdir(mode=0o755)
     with ZipFile(ROOT/'dist/psoydo-upload.zip') as z:z.extractall(site)
     config=base/'httpd.conf'
-    modules=['mpm_event','authz_core','authz_host','mime','dir','rewrite']
+    modules=['mpm_event','authz_core','authz_host','mime','dir','rewrite','headers']
     config.write_text(f'''ServerRoot "/etc/apache2"
 ServerName localhost
 Listen 127.0.0.1:8091
@@ -33,7 +33,7 @@ DirectoryIndex index.html
 <Directory "{site}">
   Options FollowSymLinks
   Require all granted
-  AllowOverride FileInfo
+  AllowOverride All
 </Directory>
 ''')
     # Directives must be parsed after their modules have loaded.
@@ -52,6 +52,10 @@ DirectoryIndex index.html
             try:response=opener.open(req)
             except urllib.error.HTTPError as e:response=e
             assert response.code==status,(path,response.code,status)
+            if path == '/de/':
+                assert response.headers.get('X-Content-Type-Options') == 'nosniff', 'Missing nosniff response header'
+                assert 'max-age=' in response.headers.get('Strict-Transport-Security', ''), 'Missing HSTS'
+                assert "object-src 'none'" in response.headers.get('Content-Security-Policy', ''), 'Missing minimal CSP'
             if location:assert response.headers['Location']==location,(path,response.headers)
             if status==404:assert b'ERROR / 404' in response.read()
         print('Apache routing passed:',len(checks),'status, canonical, query-preservation and real-404 cases.')
