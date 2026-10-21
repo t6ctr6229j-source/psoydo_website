@@ -9,3 +9,5 @@
 - All automatic imported A/AAAA records are DNS-only; existing MX and SPF retained. Independently compare the complete authoritative United Domains zone (including subdomains and TXT records) before any nameserver delegation.
 - Check the lightbox, every SEO use case, scripts/consent, routing and analytics in preview. No live DNS changes were made here.
 - Psoydo's Apache security PR #28 is separate: merge it only after passing Apache route QA and confirming its compatibility with the current host.
+
+Cloudflare Git connection smoke test: 2026-10-21. This commit should trigger the independent Pages preview deployment; it does not touch DNS or the current United Domains website.
