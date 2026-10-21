@@ -1,0 +1,48 @@
+name: Psoydo SFTP host-key and release preflight
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/sftp-host-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify deployed host fingerprint consistency
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          cfg=json.load(open('deployment/ud-host.json'))
+          assert cfg['host']=='access-5020757126.ud-webspace.de'
+          assert cfg['port']==22
+          assert cfg['key_type']=='ssh-ed25519'
+          print('Committed host:',cfg['host'])
+          print('Expected fingerprint:',cfg['fingerprint'])
+          PY
+          ssh-keyscan -T 20 -p 22 -t ed25519 access-5020757126.ud-webspace.de 2>/tmp/psoydo-ssh-scan-error > /tmp/psoydo-known-hosts
+          test -s /tmp/psoydo-known-hosts || { cat /tmp/psoydo-ssh-scan-error; echo 'SFTP server key cannot be read'; exit 1; }
+          ssh-keygen -lf /tmp/psoydo-known-hosts -E sha256
+          actual="$(ssh-keygen -lf /tmp/psoydo-known-hosts -E sha256 | awk '{print $2}' | head -n 1)"
+          expected="$(python3 -c 'import json;print(json.load(open("deployment/ud-host.json"))["fingerprint"])')"
+          if [ "$actual" != "$expected" ]; then
+            echo 'CRITICAL: observed SSH host key differs from committed pin'; exit 1
+          fi
+          echo 'PASS: Independently queried GitHub runner sees the same pinned SSH host key.'
+          echo 'NOTE: This proves key consistency, not an independent verification by the hosting provider.'
+      - name: Exercise atomic SFTP backup and rollback locally
+        run: |
+          python3 -m pip install --quiet paramiko==5.0.0
+          python3 scripts/test_deploy_sftp.py
+      - name: Verify production release packaging and Apache syntax
+        run: |
+          python3 scripts/qa_site.py
+          python3 scripts/check_seo.py
+          node --check app.js
+          python3 scripts/build_release.py
+          test -s dist/psoydo-upload.zip
