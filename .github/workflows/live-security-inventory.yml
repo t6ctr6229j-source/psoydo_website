@@ -1,0 +1,37 @@
+name: Live security header inventory
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/live-security-inventory.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Check four public websites without changing anything
+        shell: bash
+        run: |
+          set -uo pipefail
+          for pair in \
+            'wescaleIT|https://wescaleit.com/' \
+            'FCTH|https://www.ciso2hero.com/' \
+            'Psoydo|https://psoydo.com/de/' \
+            'Silverback|https://www.silverback-network.com/'; do
+            name="${pair%%|*}"
+            url="${pair#*|}"
+            headers="$(mktemp)"
+            echo "--- $name ($url) ---"
+            curl -sSL --retry 2 --max-time 25 --dump-header "$headers" --output /dev/null \
+                 --write-out 'Status: %{http_code}, effective: %{url_effective}, TLS verified: %{ssl_verify_result}\n' "$url" || echo 'Network request failed'
+            for header in strict-transport-security x-content-type-options content-security-policy referrer-policy x-frame-options permissions-policy; do
+              value="$(grep -i "^$header:" "$headers" | tail -n 1 | cut -d : -f2- | xargs || true)"
+              if [ -n "$value" ]; then
+                echo "$header: $value"
+              else
+                echo "$header: NOT OBSERVED"
+              fi
+            done
+          done
