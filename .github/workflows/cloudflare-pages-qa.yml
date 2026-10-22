@@ -1,0 +1,50 @@
+name: Psoydo Cloudflare Pages static QA
+on:
+  pull_request:
+    paths:
+      - 'scripts/build-cloudflare-pages.sh'
+      - '.github/workflows/cloudflare-pages-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate production pages and route package
+        run: |
+          python3 scripts/qa_site.py
+          python3 scripts/check_seo.py
+          sh scripts/build-cloudflare-pages.sh
+      - name: Verify only public assets are shipped
+        run: |
+          test -s cf-dist/de/index.html
+          test -s cf-dist/404.html
+          test -s cf-dist/og-image.png
+          test ! -d cf-dist/docs
+          test ! -d cf-dist/deployment
+          test ! -d cf-dist/scripts
+          test ! -e cf-dist/.htaccess
+          grep -q '^/en/ /de/ 301' cf-dist/_redirects
+          grep -q 'X-Robots-Tag: noindex, nofollow' cf-dist/_headers
+          node --check cf-dist/app.js
+  smoke:
+    needs: check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify live Pages preview URLs and preview-only security headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://psoydo-website.pages.dev'
+          for route in '/de/' '/de/produkt.html' '/de/sicherheit.html' '/de/datenschutz.html' '/robots.txt' '/sitemap.xml' '/app.js'; do
+            code="$(curl --retry 3 -fsSL --max-time 30 --output /dev/null --write-out '%{http_code}' "$base$route")"
+            test "$code" = "200" || { echo "Unexpected $code at $base$route"; exit 1; }
+          done
+          curl --retry 3 -fsSL --max-time 30 --dump-header /tmp/preview-headers --output /tmp/preview-index "$base/de/"
+          grep -iq '^x-robots-tag:.*noindex' /tmp/preview-headers
+          grep -iq '^x-content-type-options:.*nosniff' /tmp/preview-headers
+          unknown="$(curl -sSL --max-time 30 --output /dev/null --write-out '%{http_code}' "$base/unknown-psoydo-6940")"
+          test "$unknown" = "404" || { echo "Expected HTTP 404, got $unknown"; exit 1; }
+          echo 'PASS: live Pages preview URLs, security, staging noindex and 404'
