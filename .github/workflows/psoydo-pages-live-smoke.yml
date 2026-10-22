@@ -1,0 +1,39 @@
+name: Psoydo Pages cutover read-only smoke
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/psoydo-pages-live-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Assert HTTPS, main paths, indexability and Pages response
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://psoydo.com'
+          for path in '/de/' '/de/impressum.html' '/de/datenschutz.html' '/robots.txt' '/sitemap.xml' '/app.js'; do
+            code="$(curl -sSL --max-time 25 --retry 3 --output /dev/null --write-out '%{http_code}' "$base$path")"
+            test "$code" = '200' || { echo "FAILED $base$path: $code"; exit 1; }
+            echo "PASS $base$path HTTP=$code"
+          done
+          missing="$(curl -sSL --max-time 25 --output /dev/null --write-out '%{http_code}' "$base/de/nonexistent-cutover-87333")"
+          test "$missing" = '404' || { echo "FAILED expected 404, got $missing"; exit 1; }
+          curl -fsSL --max-time 25 --dump-header /tmp/headers-apex --output /tmp/apex-home "$base/de/"
+          grep -qi '^cf-ray:' /tmp/headers-apex
+          grep -qi '^x-content-type-options:.*nosniff' /tmp/headers-apex
+          if grep -qi '^x-robots-tag:.*noindex' /tmp/headers-apex; then
+            echo 'BLOCKED: public production domain incorrectly marked noindex'; exit 1
+          fi
+          grep -iq 'Psoydo' /tmp/apex-home
+          curl -sS --head --max-time 25 'https://www.psoydo.com/de/?source=github-smoke' > /tmp/headers-www
+          grep -qi '^HTTP/.* 301' /tmp/headers-www
+          grep -qiF 'location: https://psoydo.com/de/?source=github-smoke' /tmp/headers-www
+          preview_headers="$(mktemp)"
+          curl -fsSL --max-time 25 --dump-header "$preview_headers" --output /dev/null 'https://psoydo-website.pages.dev/de/'
+          grep -qi '^x-robots-tag:.*noindex' "$preview_headers"
+          echo 'PASS Psoydo Cloudflare Pages production, canonical query-preserving 301, HTTPS, noindex isolation and HTTP 404'
