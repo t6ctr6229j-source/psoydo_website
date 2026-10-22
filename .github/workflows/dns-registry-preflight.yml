@@ -1,0 +1,30 @@
+name: Psoydo registrar cutover preflight
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/dns-registry-preflight.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lookup:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check .com registry delegation and independent DNS caches
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v dig >/dev/null 2>&1; then sudo apt-get update -qq && sudo apt-get install -y -qq dnsutils >/dev/null; fi
+          for server in a.gtld-servers.net b.gtld-servers.net; do
+            echo "REGISTRY $server"
+            dig +time=5 +tries=2 +norecurse +noall +answer +authority @"$server" psoydo.com NS || true
+          done
+          python3 - <<'PY'
+          import json,urllib.parse,urllib.request
+          target={'quinton.ns.cloudflare.com','savanna.ns.cloudflare.com'}
+          for provider in ('https://dns.google/resolve','https://cloudflare-dns.com/dns-query'):
+              req=urllib.request.Request(provider+'?'+urllib.parse.urlencode({'name':'psoydo.com','type':'NS'}),headers={'Accept':'application/dns-json'})
+              with urllib.request.urlopen(req,timeout=30) as response: data=json.load(response)
+              names={r['data'].lower().rstrip('.') for r in data.get('Answer',[]) if r.get('type')==2}
+              print('RESOLVER',provider,'NS',','.join(sorted(names)),'CLOUDFLARE_MATCH',names==target)
+          PY
