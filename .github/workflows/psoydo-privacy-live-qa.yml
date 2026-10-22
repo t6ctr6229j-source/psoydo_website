@@ -1,0 +1,29 @@
+name: Psoydo Cloudflare hosting legal notice live QA
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/psoydo-privacy-live-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify correct hosting privacy notice on public hostname
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location --max-time 30 --retry 3 \
+            --dump-header /tmp/psoydo-privacy-headers \
+            --output /tmp/psoydo-privacy \
+            'https://psoydo.com/de/datenschutz'
+          grep -q 'Cloudflare Pages' /tmp/psoydo-privacy
+          grep -q 'Die Domainregistrierung erfolgt weiterhin' /tmp/psoydo-privacy
+          grep -q 'Cloudflare, Inc.' /tmp/psoydo-privacy
+          if grep -iq '^x-robots-tag:.*noindex' /tmp/psoydo-privacy-headers; then
+            echo 'BLOCKED: public privacy page marked noindex'; exit 1
+          fi
+          grep -qi '^cf-ray:' /tmp/psoydo-privacy-headers
+          curl --fail --silent --show-error --location --max-time 30 --output /dev/null 'https://psoydo.com/de/'
+          echo 'PASS: Cloudflare Pages privacy hosting disclosure is deployed publicly on indexable TLS website.'
