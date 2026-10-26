@@ -746,3 +746,41 @@
   });
 })();
 
+
+
+/* Product example only: static, fictional content; no data is processed or transmitted. */
+(function(){
+  'use strict';
+  var demo=document.querySelector('[data-psoydo-demo]');
+  if(!demo)return;
+  var original=demo.querySelector('#psoydo-demo-original');
+  var protectedText=demo.querySelector('#psoydo-demo-protected');
+  var explanation=demo.querySelector('#psoydo-demo-insight');
+  var cases={
+    vertrag:{
+      original:'Nina Berger prüft den Entwurf der Beispielwerk GmbH. Nina Berger informiert Tim Vogel. Beispielwerk GmbH verlangt bis Freitag eine überarbeitete Fassung.',
+      protected:'PERSON_001 prüft den Entwurf der FIRMA_001. PERSON_001 informiert PERSON_002. FIRMA_001 verlangt bis Freitag eine überarbeitete Fassung.',
+      insight:'Die wiederkehrende Person und Firma behalten denselben Ersatzwert. Aufgabe, Frist und Beziehungen bleiben nachvollziehbar.'
+    },
+    support:{
+      original:'Jana Sommer (jana@beispiel.invalid) meldet im Ticket T-241 einen doppelten Rechnungsversand. Jana Sommer verweist auf Ticket T-218. Tim Vogel soll beide Fälle prüfen.',
+      protected:'PERSON_001 (EMAIL_001) meldet im Ticket TICKET_001 einen doppelten Rechnungsversand. PERSON_001 verweist auf Ticket TICKET_002. PERSON_002 soll beide Fälle prüfen.',
+      insight:'Die Ticketbeziehungen und das Fehlerbild bleiben erkennbar. Namen, E-Mail-Adresse und Ticketkennungen sind in diesem Beispiel konsistent ersetzt.'
+    }
+  };
+  demo.querySelectorAll('[data-demo-case]').forEach(function(button){
+    button.addEventListener('click',function(){
+      var key=button.getAttribute('data-demo-case');
+      var selected=Object.prototype.hasOwnProperty.call(cases,key)?cases[key]:null;
+      if(!selected)return;
+      demo.querySelectorAll('[data-demo-case]').forEach(function(other){
+        var active=other===button;
+        other.setAttribute('aria-pressed',String(active));
+        other.classList.toggle('is-active',active);
+      });
+      original.textContent=selected.original;
+      protectedText.textContent=selected.protected;
+      explanation.textContent=selected.insight;
+    });
+  });
+})();
