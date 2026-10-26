@@ -60,6 +60,27 @@ for (const [name, path, viewport] of captures) {
   if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 2)) {
     throw new Error(name + ': horizontal overflow');
   }
+  if (path === '/de/produkt.html') {
+    const demo = page.locator('[data-psoydo-demo]');
+    if (await demo.count() !== 1) throw new Error(name + ': synthetic comparison missing');
+    const original = page.locator('#psoydo-demo-original');
+    const protectedExample = page.locator('#psoydo-demo-protected');
+    if (!(await protectedExample.textContent()).includes('PERSON_001')) {
+      throw new Error(name + ': default protected example invalid');
+    }
+    await page.locator('[data-demo-case="support"]').click();
+    if ((await original.textContent()).indexOf('Jana Sommer') === -1 ||
+        !(await protectedExample.textContent()).includes('TICKET_001')) {
+      throw new Error(name + ': example switch failed');
+    }
+    if (await page.locator('[data-demo-case="support"]').getAttribute('aria-pressed') !== 'true') {
+      throw new Error(name + ': comparison accessibility state invalid');
+    }
+    await page.locator('[data-demo-case="vertrag"]').click();
+    if (await page.locator('[data-demo-case="vertrag"]').getAttribute('aria-pressed') !== 'true') {
+      throw new Error(name + ': cannot restore initial example');
+    }
+  }
   if (path === '/de/ki-pseudonymisierung.html') {
     await page.getByRole('link', {name: 'Praxischeck', exact: true}).click();
     const top = await page.locator('#praxischeck').evaluate(el => el.getBoundingClientRect().top);
