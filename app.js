@@ -401,6 +401,36 @@
     renderAiQuizQuestion();
   }
 
+  // Tally is deliberately loaded only after an explicit user action.
+  // A Tally draft may not render until it is separately published.
+  var tallyOpen=document.getElementById('pilot-tally-open');
+  var tallyClose=document.getElementById('pilot-tally-close');
+  var tallyFrame=document.getElementById('pilot-tally-frame');
+  if(tallyOpen&&tallyClose&&tallyFrame){
+    tallyOpen.addEventListener('click',function(){
+      if(tallyFrame.querySelector('iframe'))return;
+      var frame=document.createElement('iframe');
+      frame.title='Psoydo Pilot unverbindlich anfragen';
+      frame.loading='lazy';
+      frame.referrerPolicy='strict-origin-when-cross-origin';
+      frame.setAttribute('allow','');
+      frame.src='https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1';
+      tallyFrame.hidden=false;
+      tallyFrame.appendChild(frame);
+      tallyOpen.setAttribute('aria-expanded','true');
+      tallyOpen.hidden=true;
+      tallyClose.hidden=false;
+      if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_form_open');
+    });
+    tallyClose.addEventListener('click',function(){
+      tallyFrame.replaceChildren();
+      tallyFrame.hidden=true;
+      tallyOpen.hidden=false;
+      tallyOpen.setAttribute('aria-expanded','false');
+      tallyClose.hidden=true;
+      tallyOpen.focus();
+    });
+  }
   var pilotEmail=document.getElementById('pilot-email');
   if(pilotEmail)pilotEmail.addEventListener('click',function(){
     if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_email_click');
