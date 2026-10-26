@@ -47,4 +47,6 @@ for page in sorted((ROOT/'de').glob('*.html')):
         assert not re.search('[—–]',plain(text)), (page.name,'editorial dash')
 assert 'typeform' not in (ROOT/'app.js').read_text().lower()
 assert 'mailto:info@wescaleit.com?subject=Psoydo%20Pilotanfrage' in (ROOT/'de/index.html').read_text()
+assert 'data-tally-form="KppMYg"' in (ROOT/'de/index.html').read_text()
+assert 'pilot-tally-open' in (ROOT/'app.js').read_text()
 print('SEO semantics passed: canonicals, entity consistency, net pilot terms, article dates, visible FAQ parity, contact and retired form guard.')
