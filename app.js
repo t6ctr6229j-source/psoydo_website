@@ -401,34 +401,77 @@
     renderAiQuizQuestion();
   }
 
-  // Tally is deliberately loaded only after an explicit user action.
-  // A Tally draft may not render until it is separately published.
+  // No Tally network requests before a deliberate click on the pilot CTA.
+  // The Tally form stays a draft until separately approved and published.
   var tallyOpen=document.getElementById('pilot-tally-open');
   var tallyClose=document.getElementById('pilot-tally-close');
   var tallyFrame=document.getElementById('pilot-tally-frame');
-  if(tallyOpen&&tallyClose&&tallyFrame){
+  var tallyContact=document.getElementById('pilot-contact');
+  if(tallyOpen&&tallyClose&&tallyFrame&&tallyContact){
+    var lastPilotSubmissionId='';
+    var tallyURL='https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1';
+    function loadTallyWidget(frame){
+      if(window.Tally&&typeof window.Tally.loadEmbeds==='function'){
+        window.Tally.loadEmbeds();
+        return;
+      }
+      var loader=document.getElementById('psoydo-tally-widget');
+      if(!loader){
+        loader=document.createElement('script');
+        loader.id='psoydo-tally-widget';
+        loader.src='https://tally.so/widgets/embed.js';
+        loader.async=true;
+        document.head.appendChild(loader);
+      }
+      loader.addEventListener('load',function(){
+        if(window.Tally&&typeof window.Tally.loadEmbeds==='function')window.Tally.loadEmbeds();
+      },{once:true});
+      loader.addEventListener('error',function(){
+        // Keep a usable iframe if the optional auto-height script is blocked.
+        if(frame.isConnected&&!frame.src)frame.src=tallyURL;
+      },{once:true});
+    }
     tallyOpen.addEventListener('click',function(){
       if(tallyFrame.querySelector('iframe'))return;
       var frame=document.createElement('iframe');
       frame.title='Psoydo Pilot unverbindlich anfragen';
       frame.loading='lazy';
+      frame.width='100%';
+      frame.height='620';
       frame.referrerPolicy='strict-origin-when-cross-origin';
-      frame.setAttribute('allow','');
-      frame.src='https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1';
+      frame.setAttribute('data-tally-src',tallyURL);
       tallyFrame.hidden=false;
       tallyFrame.appendChild(frame);
+      tallyContact.classList.add('is-tally-open');
       tallyOpen.setAttribute('aria-expanded','true');
       tallyOpen.hidden=true;
       tallyClose.hidden=false;
+      loadTallyWidget(frame);
       if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_form_open');
     });
     tallyClose.addEventListener('click',function(){
       tallyFrame.replaceChildren();
       tallyFrame.hidden=true;
+      tallyContact.classList.remove('is-tally-open');
       tallyOpen.hidden=false;
       tallyOpen.setAttribute('aria-expanded','false');
       tallyClose.hidden=true;
       tallyOpen.focus();
+    });
+    // Tally's documented embed event is a cross-origin postMessage.
+    // Verify origin, sending iframe and form ID; never forward form answers to GA.
+    window.addEventListener('message',function(event){
+      if(event.origin!=='https://tally.so'||typeof event.data!=='string')return;
+      var frame=tallyFrame.querySelector('iframe');
+      if(!frame||event.source!==frame.contentWindow||
+         event.data.indexOf('Tally.FormSubmitted')===-1)return;
+      var message;
+      try{message=JSON.parse(event.data);}catch(error){return;}
+      var submission=message&&message.payload;
+      if(!submission||submission.formId!=='KppMYg'||!submission.id||
+         submission.id===lastPilotSubmissionId)return;
+      lastPilotSubmissionId=submission.id;
+      if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_form_submitted');
     });
   }
   var pilotEmail=document.getElementById('pilot-email');
