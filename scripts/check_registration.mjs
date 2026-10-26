@@ -22,6 +22,9 @@ export async function checkRegistration(browser) {
       assert.equal(await contact.isVisible(),true);
       assert.equal(await contact.getAttribute('href'),'mailto:info@wescaleit.com?subject=Psoydo%20Pilotanfrage');
       assert.equal(await page.locator('#pilot-contact iframe').count(),0);
+      assert.equal(await page.locator('#pilot-tally-open').count(),1);
+      assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
+      assert.equal(await page.locator('#pilot-tally-frame').isHidden(),true);
       assert.equal(await page.locator('script[src*="typeform"]').count(),0);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       assert.deepEqual(external,[],'Pilot contact must not request external forms or measurement after denial');
