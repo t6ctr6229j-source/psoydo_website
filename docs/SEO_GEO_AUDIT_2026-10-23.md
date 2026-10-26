@@ -71,3 +71,11 @@ Psoydo soll Unternehmen erreichen, die externe KI mit sensiblen Unternehmensdate
 ## Abnahme vor Merge
 
 `python scripts/qa_site.py`, `python scripts/check_seo.py`, `python scripts/check_routes.py`, `node --check app.js`, `sh scripts/build-cloudflare-pages.sh`; außerdem mobile und Desktop-Visual-QA, Consent/GA4, robots, Canonical, JSON-LD, FAQ-Schema, Sitemap, Weiterleitungen. Bestehende CI ist maßgeblich. Keine produktive Veröffentlichung ohne Review.
+
+## Conversion-Sprint 26.10.2026 (nur Draft)
+
+- Tally-Formular **KppMYg** als unveröffentlichter Entwurf in Tally angelegt: Unternehmen, Ansprechpartner, geschäftliche E-Mail, kurze Beschreibung des KI-Anwendungsfalls. Nur unverbindliche Anfrage; keine zahlungspflichtige Bestellung.
+- In `de/index.html` und `app.js` ist ein **Click-to-load-iFrame** vorbereitet. Kein Netzwerkzugriff zu Tally vor Klick; Mailto-Fallback bleibt jederzeit verfügbar. GA4 erfasst optional und nur nach Analytics-Einwilligung das Öffnen, **nicht** den Abschluss des Formulars.
+- Tally-Draft wird ohne separate Veröffentlichung keine produktiven Antworten annehmen. Das ist beabsichtigt: Vor Go-live Tally-Publish, datenschutzrechtliche Freigabe, Ende-zu-Ende-Test des Formularversands, Einbettung und der Mail-Benachrichtigung erforderlich.
+- `de/datenschutz.html` enthält einen als geplant gekennzeichneten Tally-Abschnitt. **Juristische Prüfung vor Veröffentlichung zwingend**, einschließlich AVV/DPA, Datenregionen, Unterauftragsverarbeiter, Drittlandtransfer, Fristen.
+- Keine Anfrage-/Kontaktwerte als GA4-Key Event deklarieren, solange kein bestätigter erfolgreicher Tally-Submit mit zulässiger Messgrundlage nachgewiesen ist.
