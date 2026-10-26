@@ -4435,7 +4435,7 @@ body.lightbox-open{overflow:hidden}
 
 
 /* Psoydo product demonstration. All example data is static and synthetic. */
-.psoydo-demo{background:var(--v3-paper);color:var(--v3-ink)}
+.psoydo-demo{background:var(--v3-paper2);color:var(--v3-ink)}
 .psoydo-demo-surface{margin-top:42px;padding:clamp(20px,3.6vw,44px);background:var(--v3-ink);color:#f6faf7;border-radius:22px;border:1px solid var(--v3-darkline)}
 .psoydo-demo-head{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:25px}
 .psoydo-demo-caption{margin:0;font:500 11px/1.4 var(--mono);letter-spacing:.12em;color:#b2c9bd}
