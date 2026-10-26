@@ -28,6 +28,39 @@ export async function checkRegistration(browser) {
       assert.equal(await page.locator('script[src*="typeform"]').count(),0);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
       assert.deepEqual(external,[],'Pilot contact must not request external forms or measurement after denial');
+      // The iframe and Tally widget must never be requested before click.
+      if(javaScriptEnabled){
+        await page.locator('#pilot-tally-open').click();
+        await page.locator('#pilot-tally-frame iframe').waitFor({state:'attached'});
+        assert.equal(await page.locator('#pilot-tally-frame').isVisible(),true);
+        assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'true');
+        assert.equal(await page.locator('#pilot-tally-frame iframe').getAttribute('data-tally-src'),
+          'https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1');
+        assert.equal(await page.locator('#psoydo-tally-widget').count(),1);
+        // Spoofed / wrong-origin messages must not count as submissions.
+        const events=await page.evaluate(()=>{
+          const captured=[];
+          window.__psoydoTrack=(name)=>captured.push(name);
+          const iframe=document.querySelector('#pilot-tally-frame iframe');
+          const payload=JSON.stringify({event:'Tally.FormSubmitted',
+            payload:{formId:'KppMYg',id:'qa-only-01',fields:[{title:'Email',answer:{value:'private@example.com'}}]}});
+          window.dispatchEvent(new MessageEvent('message',{origin:'https://evil.example',
+            source:iframe.contentWindow,data:payload}));
+          window.dispatchEvent(new MessageEvent('message',{origin:'https://tally.so',
+            source:iframe.contentWindow,data:JSON.stringify({event:'Tally.FormSubmitted',payload:{formId:'other-form',id:'qa-only-02'}})}));
+          window.dispatchEvent(new MessageEvent('message',{origin:'https://tally.so',
+            source:iframe.contentWindow,data:payload}));
+          window.dispatchEvent(new MessageEvent('message',{origin:'https://tally.so',
+            source:iframe.contentWindow,data:payload}));
+          return captured;
+        });
+        assert.deepEqual(events,['psoydo_pilot_form_submitted'],
+          'Only a genuine-looking first submit for the correct iframe/form is tracked, without answers');
+        await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-tally-${width}.png`});
+        await page.locator('#pilot-tally-close').click();
+        assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
+        assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'false');
+      }
       await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-email-${width}-${javaScriptEnabled}.png`});
       await context.close();
     }
