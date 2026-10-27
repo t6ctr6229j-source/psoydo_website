@@ -18,9 +18,13 @@ for page in sorted((ROOT/'de').glob('*.html')):
     assert len(ids)==len(set(ids)), (page.name,'duplicate entity')
     for node in graph:
         if node.get('@type')=='Organization':
+            assert node.get('@id')=='https://wescaleit.com/#organization', (page.name,'corporate entity id')
             assert node['name']=='wescaleIT AG'
             assert node['address']['addressLocality']=='Ulm'
             assert node['telephone']=='+49 731 40 32 13 75'
+        if node.get('@type')=='SoftwareApplication':
+            assert node.get('provider',{}).get('@id')=='https://wescaleit.com/#organization'
+            assert node.get('brand',{}).get('@id')=='https://wescaleit.com/#brand-psoydo'
         if node.get('@type')=='Offer':
             assert node['price']=='990' and node['priceCurrency']=='EUR'
             assert node['priceSpecification']['valueAddedTaxIncluded'] is False
