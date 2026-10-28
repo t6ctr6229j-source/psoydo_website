@@ -4529,3 +4529,18 @@ body.lightbox-open{overflow:hidden}
 }
 .psoydo-tally-stage[data-tally-state="published"] #pilot-tally-email-cta,
 .psoydo-tally-stage[data-tally-state="published"] #pilot-tally-draft-note{display:none!important}
+
+
+/* QA 2026-10-28: real Lighthouse a11y findings: footer contrast and tap targets. */
+.site-footer .footer-top p{color:#bccac3}
+.site-footer .footer-bottom{color:#c3d1ca;font-size:12px;line-height:1.5}
+.site-footer .footer-provider>span{color:#b7c8c0;font-size:11px;line-height:1.4}
+.site-footer .footer-bottom>div{column-gap:16px;row-gap:2px}
+.site-footer .footer-bottom>div>a,
+.site-footer .footer-bottom>div>button{
+  display:inline-flex;align-items:center;min-height:36px;
+  box-sizing:border-box;padding:8px 0;
+  color:inherit;font-size:12px;line-height:1.45;
+}
+.site-footer .footer-bottom>div>a:hover,
+.site-footer .footer-bottom>div>button:hover{color:#ffffff}
