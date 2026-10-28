@@ -23,6 +23,16 @@ export async function checkRegistration(browser) {
       assert.equal(await contact.getAttribute('href'),'mailto:info@wescaleit.com?subject=Psoydo%20Pilotanfrage');
       assert.equal(await page.locator('#pilot-contact iframe').count(),0);
       assert.equal(await page.locator('#pilot-tally-open').count(),1);
+      assert.equal(await page.locator('.psoydo-tally-stage').getAttribute('data-tally-state'),'draft');
+      assert.equal(await page.locator('#pilot-tally-open').isHidden(),true);
+      assert.equal(await page.locator('#pilot-tally-email-cta').isVisible(),true);
+      assert.equal(await page.locator('#pilot-tally-email-cta').getAttribute('href'),
+        'mailto:info@wescaleit.com?subject=Psoydo%20Pilotanfrage');
+      // The draft preview must never display a clipped primary CTA.
+      const bounds=await page.locator('#pilot-tally-email-cta').boundingBox();
+      const cardBounds=await page.locator('.form-card').boundingBox();
+      assert.ok(bounds&&cardBounds&&bounds.y>=cardBounds.y&&bounds.y+bounds.height<=cardBounds.y+cardBounds.height+1,
+        'Pilot CTA must be completely inside the visible card');
       assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
       assert.equal(await page.locator('#pilot-tally-frame').isHidden(),true);
       assert.equal(await page.locator('script[src*="typeform"]').count(),0);
@@ -30,6 +40,15 @@ export async function checkRegistration(browser) {
       assert.deepEqual(external,[],'Pilot contact must not request external forms or measurement after denial');
       // The iframe and Tally widget must never be requested before click.
       if(javaScriptEnabled){
+        // Clicking a draft cannot create a public 404 iframe.
+        await page.locator('#pilot-tally-open').evaluate(button=>button.click());
+        assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
+        assert.equal(await page.locator('#psoydo-tally-widget').count(),0);
+        // Simulate the post-approval state to retain coverage of the future Tally integration.
+        await page.evaluate(()=>{
+          document.querySelector('.psoydo-tally-stage').dataset.tallyState='published';
+          document.querySelector('#pilot-tally-open').hidden=false;
+        });
         await page.locator('#pilot-tally-open').click();
         await page.locator('#pilot-tally-frame iframe').waitFor({state:'attached'});
         assert.equal(await page.locator('#pilot-tally-frame').isVisible(),true);
