@@ -4460,3 +4460,58 @@ body.lightbox-open{overflow:hidden}
 .psoydo-demo-actions a{font-size:14px;text-decoration:underline;text-underline-offset:4px;color:#f6faf7}
 .psoydo-demo-actions a:hover{color:var(--v3-green)}
 @media(max-width:740px){.psoydo-demo-surface{margin-top:26px;border-radius:14px}.psoydo-demo-grid{grid-template-columns:1fr}.psoydo-demo-pane+.psoydo-demo-pane{border-left:0;border-top:1px solid rgba(255,255,255,.2)}.psoydo-demo-example{min-height:auto;margin-top:18px}.psoydo-demo-result{padding:21px 0}}
+
+
+/* QA 2026-10-28: keep the pilot button and fallback visible at every viewport. */
+.v3-register .form-card{min-height:0;height:auto}
+.v3-register .form-card #pilot-contact.registration-entry,
+.form-card #pilot-contact.registration-entry{
+  height:auto;min-height:0;overflow:visible;
+  padding-bottom:clamp(24px,3vw,44px);
+  box-sizing:border-box;
+}
+.v3-register .psoydo-tally-stage{max-width:100%;min-width:0}
+.v3-register #pilot-tally-open{display:flex;justify-content:center;align-items:center;gap:12px;min-height:54px;white-space:normal;text-align:center}
+.v3-register #pilot-tally-open[hidden]{display:none!important}
+
+/* Large fictional use-case headings must stay inside their grid cells. */
+.case-study-grid>*,.case-study-result>*{min-width:0;max-width:100%}
+.case-study h2{
+  max-width:100%;font-size:clamp(36px,5vw,76px);
+  line-height:1.04;letter-spacing:-.063em;
+  overflow-wrap:break-word;word-break:normal;hyphens:auto;text-wrap:balance;
+}
+.case-study-result .case-big strong{
+  max-width:100%;font-size:clamp(31px,3.15vw,54px);
+  line-height:1.08;letter-spacing:-.056em;
+  overflow-wrap:break-word;word-break:normal;hyphens:auto;text-wrap:balance;
+}
+@media(max-width:780px){
+  .case-study h2{font-size:clamp(36px,9vw,54px)}
+  .case-study-result .case-big strong{font-size:clamp(32px,8.2vw,49px)}
+}
+
+/* Consistent and compact footer across all German pages. */
+.site-footer{padding:52px 0 26px}
+.site-footer .footer-top{
+  min-height:0;display:flex;flex-direction:row;align-items:center;
+  justify-content:space-between;gap:26px;padding-bottom:30px;
+}
+.site-footer .footer-top .footer-logo{flex:0 0 auto;max-width:240px;min-width:0}
+.site-footer .footer-top .brand-wordmark{display:block;width:min(100%,240px);height:auto;object-fit:contain}
+.site-footer .footer-top p{max-width:420px;margin:0;text-align:right;line-height:1.6}
+.site-footer .footer-bottom{display:flex;flex-direction:row;gap:26px;align-items:center;padding-top:24px}
+.site-footer .footer-bottom>div{justify-content:flex-end;row-gap:12px;column-gap:20px}
+.site-footer .footer-provider{flex:0 0 auto;max-width:300px}
+.site-footer .footer-provider img{width:120px}
+.site-footer .footer-contact{margin-top:24px;padding-top:18px;padding-bottom:14px;align-items:flex-start}
+.site-footer #consent-reopen{margin:10px 0}
+@media(max-width:780px){
+  .site-footer{padding:42px 0 24px}
+  .site-footer .footer-top{flex-direction:column;align-items:flex-start;gap:16px;padding-bottom:23px}
+  .site-footer .footer-top p{max-width:520px;text-align:left}
+  .site-footer .footer-bottom{flex-direction:column;align-items:flex-start;gap:20px}
+  .site-footer .footer-bottom>div{justify-content:flex-start}
+  .site-footer .footer-provider img{width:105px}
+  .site-footer .footer-contact{margin-top:18px;padding-top:18px}
+}
