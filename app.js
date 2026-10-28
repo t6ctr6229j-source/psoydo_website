@@ -432,6 +432,9 @@
       },{once:true});
     }
     tallyOpen.addEventListener('click',function(){
+      // Never expose a Tally draft's public 404 page. Publish the form and
+      // deliberately switch data-tally-state to "published" after legal approval.
+      if(tallyOpen.closest('[data-tally-state]')?.dataset.tallyState!=='published')return;
       if(tallyFrame.querySelector('iframe'))return;
       var frame=document.createElement('iframe');
       frame.title='Psoydo Pilot unverbindlich anfragen';
