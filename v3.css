@@ -4515,3 +4515,17 @@ body.lightbox-open{overflow:hidden}
   .site-footer .footer-provider img{width:105px}
   .site-footer .footer-contact{margin-top:18px;padding-top:18px}
 }
+
+
+/* Until Tally's pilot draft is approved, the primary contact remains usable. */
+.psoydo-tally-stage #pilot-tally-email-cta{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  box-sizing:border-box;width:100%;min-height:56px;
+  text-align:center;white-space:normal;line-height:1.35;
+}
+.psoydo-tally-stage #pilot-tally-draft-note{
+  margin:13px 0 0;max-width:100%;
+  font-size:13px;line-height:1.65;color:#4c5e57;
+}
+.psoydo-tally-stage[data-tally-state="published"] #pilot-tally-email-cta,
+.psoydo-tally-stage[data-tally-state="published"] #pilot-tally-draft-note{display:none!important}
