@@ -79,6 +79,11 @@ export async function checkRegistration(browser) {
         await page.locator('#pilot-tally-close').click();
         assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
         assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'false');
+        // The simulated published mode is test-only. Capture the real draft experience.
+        await page.evaluate(()=>{
+          document.querySelector('.psoydo-tally-stage').dataset.tallyState='draft';
+          document.querySelector('#pilot-tally-open').hidden=true;
+        });
       }
       await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-email-${width}-${javaScriptEnabled}.png`});
       await context.close();
