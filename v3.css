@@ -4586,3 +4586,67 @@ body.lightbox-open{overflow:hidden}
  .site-footer .footer-bottom{padding-top:18px}
  .site-footer .footer-contact{margin-top:14px}
 }
+
+
+/* Acceptance polish 29 October 2026: compact pilot card and safe cross-origin fallback. */
+#register.form-card{height:auto;min-height:0;align-self:start}
+#register #pilot-contact.registration-entry{
+  display:flex;flex-direction:column;align-items:stretch;
+  height:auto;min-height:0;overflow:visible;
+  padding:clamp(24px,2.8vw,40px);
+}
+#register .registration-entry-intro{min-width:0;flex:0 0 auto}
+#register .registration-entry-intro h3{
+  font-size:clamp(35px,3.4vw,54px);
+  line-height:1.04;letter-spacing:-.057em;
+  margin:16px 0 18px;
+  overflow-wrap:break-word;text-wrap:balance;
+}
+#register .registration-entry-intro p{font-size:clamp(14px,1.15vw,16px);line-height:1.58}
+#register .registration-entry .registration-help{margin:14px 0 0}
+#register .registration-entry-steps{align-self:stretch;margin-top:22px}
+#register .registration-entry-steps span{padding:11px 0;font-size:13px}
+#register .psoydo-tally-stage{margin-top:17px;max-width:100%}
+#register .psoydo-tally-stage #pilot-tally-open{
+  display:flex;min-height:56px;align-items:center;justify-content:center;
+  padding:15px 22px;line-height:1.3;box-sizing:border-box;
+  white-space:normal;text-align:center;
+}
+#register .psoydo-tally-stage #pilot-tally-open[hidden],
+#register .psoydo-tally-stage #pilot-tally-direct[hidden]{display:none!important}
+#register .psoydo-tally-stage #pilot-tally-frame iframe{
+  display:block;width:100%;min-height:650px;max-width:100%;border:0;
+}
+#register .pilot-tally-direct{margin:14px 0 0;line-height:1.55;font-size:13px}
+#register .pilot-tally-direct a{font-weight:700;text-underline-offset:4px}
+#register .registration-help a{overflow-wrap:anywhere}
+/* Protect every fictional use-case card from the global display-heading style. */
+.case-study-result .case-big{min-width:0;overflow-wrap:break-word}
+.case-study-result .case-big strong{
+  display:block;max-width:100%;
+  font-size:clamp(28px,2.7vw,45px);line-height:1.12;
+  letter-spacing:-.045em;hyphens:auto;text-wrap:balance;overflow-wrap:break-word;
+}
+.case-study-result .case-detail{min-width:0}
+.case-study-result .case-detail strong{overflow-wrap:break-word}
+/* Footer uses three explicit rows, rather than uneven inherited spacing. */
+.site-footer .footer-top{align-items:center;gap:24px;padding-bottom:24px}
+.site-footer .footer-bottom{padding:20px 0 0;row-gap:14px}
+.site-footer .footer-bottom>div{justify-content:flex-end;align-items:center;row-gap:6px}
+.site-footer .footer-bottom>div>a,.site-footer .footer-bottom>div>button{min-height:40px;margin:0}
+.site-footer .footer-provider{align-items:center;gap:14px}
+.site-footer .footer-contact{align-items:center;margin-top:20px;padding-top:20px}
+.site-footer .footer-contact>div{align-items:center;gap:8px 22px}
+@media(max-width:960px){
+  .site-footer .footer-top{align-items:flex-start}
+  .site-footer .footer-bottom>div,.site-footer .footer-contact>div{justify-content:flex-start}
+}
+@media(max-width:780px){
+  #register #pilot-contact.registration-entry{padding:22px 20px 30px}
+  #register .registration-entry-intro h3{font-size:clamp(32px,8vw,43px);line-height:1.06}
+  .case-study-result .case-big strong{font-size:clamp(27px,7.1vw,42px)}
+  .site-footer .footer-top{gap:16px;align-items:flex-start}
+  .site-footer .footer-bottom{padding-top:16px}
+  .site-footer .footer-contact{align-items:flex-start;gap:12px;margin-top:16px}
+  .site-footer .footer-contact>div{align-items:flex-start}
+}
