@@ -29,6 +29,7 @@ export async function checkRegistration(browser) {
         'No-JS visitors must still be able to contact us');
       assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
       assert.equal(await page.locator('#pilot-tally-frame').isHidden(),true);
+      assert.equal(await page.locator('#pilot-tally-direct').isHidden(),true);
       assert.equal(await page.locator('script[src*="tally.so"]').count(),0);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
       assert.deepEqual(external,[],'No external form or analytics request before explicit consent');
@@ -45,6 +46,10 @@ export async function checkRegistration(browser) {
         const frame=page.locator('#pilot-tally-frame iframe');
         await frame.waitFor({state:'attached'});
         assert.equal(await page.locator('#pilot-tally-frame').isVisible(),true);
+        assert.equal(await page.locator('#pilot-tally-direct').isVisible(),true,
+          'The published Tally form must have an external fallback when the iframe fails');
+        assert.equal(await page.locator('#pilot-tally-direct a').getAttribute('href'),
+          'https://tally.so/r/KppMYg');
         assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'true');
         const url='https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1';
         assert.equal(await frame.getAttribute('src'),url);
@@ -76,6 +81,7 @@ export async function checkRegistration(browser) {
         await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-tally-${width}.png`});
         await page.locator('#pilot-tally-close').click();
         assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
+        assert.equal(await page.locator('#pilot-tally-direct').isHidden(),true);
         assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'false');
       }
       await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-contact-${width}-${javaScriptEnabled}.png`});
