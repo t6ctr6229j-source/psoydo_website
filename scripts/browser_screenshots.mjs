@@ -60,6 +60,47 @@ for (const [name, path, viewport] of captures) {
   if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 2)) {
     throw new Error(name + ': horizontal overflow');
   }
+  // Regression coverage for the visual defects reported in acceptance screenshots.
+  if (path === '/de/anwendungsfaelle.html') {
+    const titles = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('.case-study-result .case-big')).map(cell => {
+        const heading=cell.querySelector('strong'), description=cell.querySelector('span');
+        const textRange=document.createRange();
+        textRange.selectNodeContents(heading);
+        const container=cell.getBoundingClientRect();
+        const lines=Array.from(textRange.getClientRects()).map(rect=>({left:rect.left,right:rect.right}));
+        return {
+          heading:heading.textContent.trim(),
+          lines,
+          containerLeft:container.left,
+          containerRight:container.right,
+          textBottom:heading.getBoundingClientRect().bottom,
+          descriptionTop:description.getBoundingClientRect().top,
+          fontSize:Number.parseFloat(getComputedStyle(heading).fontSize)
+        };
+      })
+    );
+    if (titles.length < 2) throw new Error(name + ': expected multiple use cases');
+    for(const title of titles){
+      if(title.fontSize>56 || title.textBottom>title.descriptionTop+1 ||
+          title.lines.some(line=>line.left<title.containerLeft-3 || line.right>title.containerRight+3)){
+        throw new Error(name + ': use-case heading overflows its card: ' + JSON.stringify(title));
+      }
+    }
+  }
+  if (path === '/de/') {
+    const footer = await page.evaluate(() => {
+      const parts=['.site-footer .footer-top','.site-footer .footer-bottom','.site-footer .footer-contact'];
+      return parts.map(selector=>{
+        const el=document.querySelector(selector),b=el?.getBoundingClientRect();
+        return {selector,top:b?.top,bottom:b?.bottom};
+      });
+    });
+    if(footer.some(part=>part.top==null) ||
+       footer.some((part,i)=>i&&part.top<footer[i-1].bottom-3)){
+      throw new Error(name + ': footer sections overlap: ' + JSON.stringify(footer));
+    }
+  }
   if (path === '/de/produkt.html') {
     const demo = page.locator('[data-psoydo-demo]');
     if (await demo.count() !== 1) throw new Error(name + ': synthetic comparison missing');
