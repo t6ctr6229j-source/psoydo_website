@@ -401,55 +401,38 @@
     renderAiQuizQuestion();
   }
 
-  // No Tally network requests before a deliberate click on the pilot CTA.
-  // The Tally form stays a draft until separately approved and published.
+  // Never request Tally until a visitor explicitly opens the pilot form.
+  // The form is published; if JavaScript is unavailable, the email CTA stays usable.
   var tallyOpen=document.getElementById('pilot-tally-open');
   var tallyClose=document.getElementById('pilot-tally-close');
   var tallyFrame=document.getElementById('pilot-tally-frame');
   var tallyContact=document.getElementById('pilot-contact');
   if(tallyOpen&&tallyClose&&tallyFrame&&tallyContact){
+    var tallyStage=tallyOpen.closest('[data-tally-state]');
     var lastPilotSubmissionId='';
     var tallyURL='https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1';
-    function loadTallyWidget(frame){
-      if(window.Tally&&typeof window.Tally.loadEmbeds==='function'){
-        window.Tally.loadEmbeds();
-        return;
-      }
-      var loader=document.getElementById('psoydo-tally-widget');
-      if(!loader){
-        loader=document.createElement('script');
-        loader.id='psoydo-tally-widget';
-        loader.src='https://tally.so/widgets/embed.js';
-        loader.async=true;
-        document.head.appendChild(loader);
-      }
-      loader.addEventListener('load',function(){
-        if(window.Tally&&typeof window.Tally.loadEmbeds==='function')window.Tally.loadEmbeds();
-      },{once:true});
-      loader.addEventListener('error',function(){
-        // Keep a usable iframe if the optional auto-height script is blocked.
-        if(frame.isConnected&&!frame.src)frame.src=tallyURL;
-      },{once:true});
+    // Hide the email-first fallback only once the interactive form is ready.
+    if(tallyStage&&tallyStage.dataset.tallyState==='published'){
+      tallyOpen.hidden=false;
+      tallyStage.classList.add('is-tally-ready');
     }
     tallyOpen.addEventListener('click',function(){
-      // Never expose a Tally draft's public 404 page. Publish the form and
-      // deliberately switch data-tally-state to "published" after legal approval.
-      if(tallyOpen.closest('[data-tally-state]')?.dataset.tallyState!=='published')return;
+      if(!tallyStage||tallyStage.dataset.tallyState!=='published')return;
       if(tallyFrame.querySelector('iframe'))return;
       var frame=document.createElement('iframe');
       frame.title='Psoydo Pilot unverbindlich anfragen';
-      frame.loading='lazy';
+      frame.loading='eager';
       frame.width='100%';
-      frame.height='620';
+      frame.height='900';
       frame.referrerPolicy='strict-origin-when-cross-origin';
       frame.setAttribute('data-tally-src',tallyURL);
+      frame.src=tallyURL; // Direct iframe load, no third-party widget script required.
       tallyFrame.hidden=false;
       tallyFrame.appendChild(frame);
       tallyContact.classList.add('is-tally-open');
       tallyOpen.setAttribute('aria-expanded','true');
       tallyOpen.hidden=true;
       tallyClose.hidden=false;
-      loadTallyWidget(frame);
       if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_form_open');
     });
     tallyClose.addEventListener('click',function(){
@@ -461,19 +444,25 @@
       tallyClose.hidden=true;
       tallyOpen.focus();
     });
-    // Tally's documented embed event is a cross-origin postMessage.
-    // Verify origin, sending iframe and form ID; never forward form answers to GA.
+    // Verify origin, iframe, event type and form ID; never send form answers to analytics.
     window.addEventListener('message',function(event){
-      if(event.origin!=='https://tally.so'||typeof event.data!=='string')return;
+      if(event.origin!=='https://tally.so')return;
       var frame=tallyFrame.querySelector('iframe');
-      if(!frame||event.source!==frame.contentWindow||
-         event.data.indexOf('Tally.FormSubmitted')===-1)return;
-      var message;
-      try{message=JSON.parse(event.data);}catch(error){return;}
-      var submission=message&&message.payload;
-      if(!submission||submission.formId!=='KppMYg'||!submission.id||
-         submission.id===lastPilotSubmissionId)return;
-      lastPilotSubmissionId=submission.id;
+      if(!frame||event.source!==frame.contentWindow)return;
+      var message=event.data;
+      if(typeof message==='string'){
+        try{message=JSON.parse(message);}catch(error){return;}
+      }
+      var payload=message&&message.payload;
+      if(!payload||payload.formId!=='KppMYg')return;
+      if(message.event==='Tally.FormHeight'){
+        var height=Number(payload.height);
+        if(Number.isFinite(height)&&height>300&&height<6000)frame.height=String(Math.ceil(height));
+        return;
+      }
+      if(message.event!=='Tally.FormSubmitted'||!payload.id||
+         payload.id===lastPilotSubmissionId)return;
+      lastPilotSubmissionId=payload.id;
       if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_form_submitted');
     });
   }
