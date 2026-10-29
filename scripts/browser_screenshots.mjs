@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import { checkErrorPage } from './check_error_page.mjs';
 import { checkMeasurement } from './check_measurement.mjs';
 import { checkRegistration } from './check_registration.mjs';
+import { checkMotion } from './check_motion.mjs';
 
 const base = process.env.BASE_URL || 'http://127.0.0.1:8080';
 const executablePath = process.env.CHROME;
@@ -59,6 +60,68 @@ for (const [name, path, viewport] of captures) {
   }
   if (await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 2)) {
     throw new Error(name + ': horizontal overflow');
+  }
+  // Regression coverage for the visual defects reported in acceptance screenshots.
+  if (path === '/de/anwendungsfaelle.html') {
+    const titles = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('.case-study-result .case-big')).map(cell => {
+        const heading=cell.querySelector('strong'), description=cell.querySelector('span');
+        const textRange=document.createRange();
+        textRange.selectNodeContents(heading);
+        const container=cell.getBoundingClientRect();
+        const lines=Array.from(textRange.getClientRects()).map(rect=>({left:rect.left,right:rect.right}));
+        return {
+          heading:heading.textContent.trim(),
+          lines,
+          containerLeft:container.left,
+          containerRight:container.right,
+          textBottom:heading.getBoundingClientRect().bottom,
+          descriptionTop:description.getBoundingClientRect().top,
+          fontSize:Number.parseFloat(getComputedStyle(heading).fontSize)
+        };
+      })
+    );
+    if (titles.length < 2) throw new Error(name + ': expected multiple use cases');
+    for(const title of titles){
+      if(title.fontSize>56 || title.textBottom>title.descriptionTop+1 ||
+          title.lines.some(line=>line.left<title.containerLeft-3 || line.right>title.containerRight+3)){
+        throw new Error(name + ': use-case heading overflows its card: ' + JSON.stringify(title));
+      }
+    }
+  }
+  if (path === '/de/') {
+    const footer = await page.evaluate(() => {
+      const parts=['.site-footer .footer-top','.site-footer .footer-bottom','.site-footer .footer-contact'];
+      return parts.map(selector=>{
+        const el=document.querySelector(selector),b=el?.getBoundingClientRect();
+        return {selector,top:b?.top,bottom:b?.bottom};
+      });
+    });
+    if(footer.some(part=>part.top==null) ||
+       footer.some((part,i)=>i&&part.top<footer[i-1].bottom-3)){
+      throw new Error(name + ': footer sections overlap: ' + JSON.stringify(footer));
+    }
+  }
+  if (path === '/de/produkt.html') {
+    const demo = page.locator('[data-psoydo-demo]');
+    if (await demo.count() !== 1) throw new Error(name + ': synthetic comparison missing');
+    const original = page.locator('#psoydo-demo-original');
+    const protectedExample = page.locator('#psoydo-demo-protected');
+    if (!(await protectedExample.textContent()).includes('PERSON_001')) {
+      throw new Error(name + ': default protected example invalid');
+    }
+    await page.locator('[data-demo-case="support"]').click();
+    if ((await original.textContent()).indexOf('Jana Sommer') === -1 ||
+        !(await protectedExample.textContent()).includes('TICKET_001')) {
+      throw new Error(name + ': example switch failed');
+    }
+    if (await page.locator('[data-demo-case="support"]').getAttribute('aria-pressed') !== 'true') {
+      throw new Error(name + ': comparison accessibility state invalid');
+    }
+    await page.locator('[data-demo-case="vertrag"]').click();
+    if (await page.locator('[data-demo-case="vertrag"]').getAttribute('aria-pressed') !== 'true') {
+      throw new Error(name + ': cannot restore initial example');
+    }
   }
   if (path === '/de/ki-pseudonymisierung.html') {
     await page.getByRole('link', {name: 'Praxischeck', exact: true}).click();
@@ -291,74 +354,6 @@ for (const [name, path, viewport] of captures) {
   await context.close();
 }
 
-// Mobile motion regression: forced motion must work even when the OS requests reduced motion.
-// The current homepage uses the in-place pseudonymization demo as its primary motion proof.
-{
-  const context = await browser.newContext({
-    viewport: { width: 390, height: 844 },
-    deviceScaleFactor: 1
-  });
-  const page = await context.newPage();
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto(base + '/de/?motion=1', { waitUntil: 'networkidle' });
-
-  const heroState = await page.evaluate(() => {
-    const root = document.documentElement;
-    const hero = document.querySelector('.home2-hero');
-    const headline = hero?.querySelector('h1');
-    const pilot = document.querySelector('a[href="#register"]');
-    return {
-      forced: root.classList.contains('motion-forced'),
-      ready: root.classList.contains('motion-ready'),
-      heroDisplay: hero ? getComputedStyle(hero).display : 'missing',
-      headlineOpacity: headline ? Number(getComputedStyle(headline).opacity) : 0,
-      pilotLabel: pilot?.textContent?.trim() || ''
-    };
-  });
-
-  if (!heroState.forced || !heroState.ready || heroState.heroDisplay === 'none' || heroState.headlineOpacity < 0.9) {
-    throw new Error('Customer-first mobile hero is not reliably visible under forced motion');
-  }
-  if (!heroState.pilotLabel.includes('Pilot starten')) {
-    throw new Error('Primary mobile CTA is not the pilot offer');
-  }
-
-  const demo = page.locator('[data-transform-demo]');
-  await demo.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1250);
-
-  const motionState = await page.evaluate(() => {
-    const demo = document.querySelector('[data-transform-demo]');
-    const scan = document.querySelector('.transform-scan');
-    const values = Array.from(document.querySelectorAll('[data-transform-demo] .transform-value'));
-    const scanStyle = scan ? getComputedStyle(scan) : null;
-    return {
-      demoState: demo?.getAttribute('data-state') || 'missing',
-      scanAnimation: scanStyle?.animationName || 'missing',
-      scanDuration: scanStyle?.animationDuration || '0s',
-      scanIterations: scanStyle?.animationIterationCount || '0',
-      minimumValueOpacity: values.length ? Math.min(...values.map(el => Number(getComputedStyle(el).opacity))) : 0
-    };
-  });
-
-  console.log('forced mobile homepage motion', { heroState, motionState });
-  if (motionState.demoState !== 'processing') {
-    throw new Error('Pseudonymization demo did not enter processing state on mobile');
-  }
-  if (motionState.scanAnimation !== 'transformScan' || parseFloat(motionState.scanDuration) < 2) {
-    throw new Error('Forced mobile pseudonymization scan is not visibly animating');
-  }
-  if (motionState.minimumValueOpacity < 0.7) {
-    throw new Error('Homepage motion is hiding record content');
-  }
-
-  await page.screenshot({
-    path: '/tmp/psoydo-browser-qa/home-mobile-motion-forced.png',
-    fullPage: false
-  });
-  await context.close();
-}
-
 // In-place pseudonymization regression: the same record must transform while context remains unchanged.
 {
   const context = await browser.newContext({
@@ -435,5 +430,6 @@ for (const [name, path, viewport] of captures) {
 
 await checkErrorPage(browser);
 await checkRegistration(browser);
+await checkMotion(browser);
 await checkMeasurement(browser);
 await browser.close();

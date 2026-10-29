@@ -18,9 +18,13 @@ for page in sorted((ROOT/'de').glob('*.html')):
     assert len(ids)==len(set(ids)), (page.name,'duplicate entity')
     for node in graph:
         if node.get('@type')=='Organization':
+            assert node.get('@id')=='https://wescaleit.com/#organization', (page.name,'corporate entity id')
             assert node['name']=='wescaleIT AG'
             assert node['address']['addressLocality']=='Ulm'
             assert node['telephone']=='+49 731 40 32 13 75'
+        if node.get('@type')=='SoftwareApplication':
+            assert node.get('provider',{}).get('@id')=='https://wescaleit.com/#organization'
+            assert node.get('brand',{}).get('@id')=='https://wescaleit.com/#brand-psoydo'
         if node.get('@type')=='Offer':
             assert node['price']=='990' and node['priceCurrency']=='EUR'
             assert node['priceSpecification']['valueAddedTaxIncluded'] is False
@@ -47,4 +51,6 @@ for page in sorted((ROOT/'de').glob('*.html')):
         assert not re.search('[—–]',plain(text)), (page.name,'editorial dash')
 assert 'typeform' not in (ROOT/'app.js').read_text().lower()
 assert 'mailto:info@wescaleit.com?subject=Psoydo%20Pilotanfrage' in (ROOT/'de/index.html').read_text()
+assert 'data-tally-form="KppMYg"' in (ROOT/'de/index.html').read_text()
+assert 'pilot-tally-open' in (ROOT/'app.js').read_text()
 print('SEO semantics passed: canonicals, entity consistency, net pilot terms, article dates, visible FAQ parity, contact and retired form guard.')
