@@ -59,10 +59,36 @@
   </header>
 
   <main id="main">
-    <section class="home2-hero">
+    <section class="home2-hero home2-hero-motion">
       <div class="shell wide home2-hero-inner">
-        <div class="home2-kicker"><i></i>SENSIBLE DATEN + LEISTUNGSFÄHIGE KI</div>
-        <h1>Die beste KI.<br><span>Ohne deine echten Daten.</span></h1>
+        <div class="home2-hero-opening">
+          <div class="home2-hero-copy">
+            <div class="home2-kicker"><i></i>SENSIBLE DATEN + LEISTUNGSFÄHIGE KI</div>
+            <h1>Die beste KI.<br><span>Ohne deine echten Daten.</span></h1>
+          </div>
+          <div class="psoydo-sculpture-wrap">
+            <div class="psoydo-sculpture" data-psoydo-sculpture aria-hidden="true">
+              <div class="psoydo-sculpture-tilt">
+                <svg class="psoydo-sculpture-native" data-native-sculpture viewBox="0 0 600 620" fill="none" focusable="false">
+                  <defs>
+                    <linearGradient id="psoydo-mint-face" x1="185" y1="106" x2="437" y2="490" gradientUnits="userSpaceOnUse"><stop stop-color="#e3fff0"/><stop offset=".31" stop-color="#92ffd0"/><stop offset=".64" stop-color="#40dba6"/><stop offset="1" stop-color="#167566"/></linearGradient>
+                    <linearGradient id="psoydo-mint-edge" x1="161" y1="91" x2="461" y2="482" gradientUnits="userSpaceOnUse"><stop stop-color="#72f8bc"/><stop offset="1" stop-color="#0b4c48"/></linearGradient>
+                    <linearGradient id="psoydo-mint-line" x1="156" y1="80" x2="476" y2="519" gradientUnits="userSpaceOnUse"><stop stop-color="#deffed"/><stop offset="1" stop-color="#3ddda4" stop-opacity=".22"/></linearGradient>
+                    <path id="psoydo-sculpture-p" fill-rule="evenodd" d="M155 501V125Q155 91 190 91H303C405 91 467 142 467 224C467 307 405 357 303 357H252V501H155ZM252 269H300C345 269 370 253 370 224C370 195 345 179 300 179H252V269Z"/>
+                  </defs>
+                  <g class="psoydo-sculpture-orbit"><ellipse cx="307" cy="302" rx="244" ry="244" stroke="#5df5b8" stroke-opacity=".13"/><ellipse cx="307" cy="302" rx="272" ry="160" transform="rotate(-32 307 302)" stroke="#5df5b8" stroke-opacity=".12"/><circle cx="88" cy="194" r="4" fill="#91ffd1"/><circle cx="526" cy="410" r="2.5" fill="#5df5b8" fill-opacity=".65"/></g>
+                  <ellipse class="psoydo-sculpture-shadow" cx="305" cy="548" rx="141" ry="13" fill="#020e12" fill-opacity=".42"/>
+                  <g class="psoydo-sculpture-depth"><use href="#psoydo-sculpture-p" fill="#0b5149" stroke="#5df5b8" stroke-opacity=".36" stroke-width="1.5"/></g>
+                  <g class="psoydo-sculpture-middle"><use href="#psoydo-sculpture-p" fill="url(#psoydo-mint-edge)" stroke="#8af9c9" stroke-opacity=".65" stroke-width="1.3"/></g>
+                  <g class="psoydo-sculpture-face"><use href="#psoydo-sculpture-p" fill="url(#psoydo-mint-face)" stroke="url(#psoydo-mint-line)" stroke-width="2"/><path d="M176 483V128Q176 112 193 112H302C393 112 446 153 446 224" stroke="#ebfff5" stroke-opacity=".44" stroke-width="1.5" stroke-linecap="round"/></g>
+                  <g class="psoydo-sculpture-measure" stroke="#8cf7c8" stroke-opacity=".3" stroke-width="1"><path d="M74 496V529H107M485 73H518V106"/><path d="M74 543H113M68 537V549M119 537V549"/></g>
+                </svg>
+              </div>
+              <span class="psoydo-sculpture-code">P / 001</span>
+            </div>
+            <div class="psoydo-sculpture-caption"><span>Identität wechselt.<br><b>Kontext bleibt.</b></span><button class="motion-toggle" type="button" data-motion-toggle aria-pressed="false" hidden><i aria-hidden="true"></i><span>Bewegung pausieren</span></button></div>
+          </div>
+        </div>
         <div class="home2-hero-lower">
           <p>Viele der spannendsten KI-Use-Cases scheitern nicht am Modell. Sie scheitern an den Daten, die du dem Modell nicht geben willst. Verträge, HR-Dokumente, Tickets, Logs: <strong>Psoydo pseudonymisiert direkte Identifikatoren, bevor die Daten an externe KI-Modelle gehen. Die fachlichen Zusammenhänge bleiben nutzbar, und du prüfst die Ausgabe vor der Freigabe.</strong></p>
           <div class="home2-hero-actions">
@@ -212,6 +238,15 @@
             <div class="transform-result"><i></i><strong data-transform-foot>Direkte Identifikatoren erkannt</strong></div>
             <div class="transform-count"><b data-transform-counter>0</b>/3 ersetzt · <span>2/2 Kontextfelder bleiben erhalten</span></div>
           </div>
+          <div class="transform-controls" data-transform-controls hidden>
+            <div class="transform-mode-buttons" role="group" aria-label="Ansicht des fiktiven Datensatzes">
+              <button type="button" data-transform-mode="original" aria-pressed="true">Original zeigen</button>
+              <button type="button" data-transform-mode="safe" aria-pressed="false">Pseudonymisieren <span aria-hidden="true">↗</span></button>
+            </div>
+            <button class="motion-toggle motion-toggle-dark" type="button" data-motion-toggle aria-pressed="false" hidden><i aria-hidden="true"></i><span>Bewegung pausieren</span></button>
+            <p class="transform-controls-note">Ein fiktiver Datensatz. Keine Eingabe, kein Upload.</p>
+            <p class="motion-sr-only" data-transform-announcement aria-live="polite" aria-atomic="true"></p>
+          </div>
         </div>
 
         <div class="transform-caption">
@@ -231,7 +266,8 @@
           <p>Psoydo ist dann relevant, wenn aus einem bisher blockierten KI-Use-Case ein realistisch testbarer Anwendungsfall wird.</p>
         </div>
       </div>
-      <div class="shell wide home2-outcome-list">
+      <div class="shell wide home2-outcome-list" data-case-list>
+        <i class="case-focus-marker" data-case-marker aria-hidden="true"></i>
         <a href="anwendungsfaelle.html#finance"><small>01 / FINANCE</small><h3>Leistung finden, die erbracht: aber nie fakturiert wurde.</h3><span>Aufträge, Tätigkeitsnachweise, Material und Rechnungen gemeinsam analysieren. ↗</span></a>
         <a href="anwendungsfaelle.html#legal"><small>02 / LEGAL</small><h3>Aus tausenden Verträgen die richtigen zuerst prüfen.</h3><span>Haftung, Preis, Laufzeit und Kündigung systematisch priorisieren. ↗</span></a>
         <a href="anwendungsfaelle.html#security"><small>03 / SECURITY</small><h3>Zusammenhängende Angriffe im Rauschen erkennen.</h3><span>Logs und Tickets korrelieren, ohne reale Nutzeridentitäten ans Modell zu geben. ↗</span></a>
@@ -424,7 +460,13 @@
         <button id="consent-reopen">Cookie-Einstellungen</button>
       </div>
     </div>
-  <div class="shell wide footer-contact"><address><strong>wescaleIT AG</strong><br>Geschäftsanschrift: Magirus-Deutz-Straße 12 · 89077 Ulm</address><div><a href="tel:+4973140321375">+49 731 40 32 13 75</a><a href="mailto:info@wescaleit.com">info@wescaleit.com</a></div></div></footer>
+  <div class="shell wide footer-contact"><address><strong>wescaleIT AG</strong><br>Geschäftsanschrift: Magirus-Deutz-Straße 12 · 89077 Ulm</address><div><a href="tel:+4973140321375">+49 731 40 32 13 75</a><a href="mailto:info@wescaleit.com">info@wescaleit.com</a></div></div>
+    <div class="shell wide footer-alias" data-alias-egg hidden>
+      <button type="button" class="footer-alias-button" data-alias-toggle aria-expanded="false" aria-controls="psoydo-alias-note" aria-label="Psoydo pseudonymisieren"><span data-alias-label>PSOYDO</span><i aria-hidden="true">↻</i></button>
+      <p id="psoydo-alias-note" data-alias-note role="status" hidden>Du hast gerade Psoydo pseudonymisiert. Kontext geblieben.</p>
+      <span class="footer-alias-hint" data-alias-hint>Auch eine Marke kann ein Pseudonym haben.</span>
+    </div>
+  </footer>
 
   <div id="consent" class="consent" role="dialog" aria-label="Cookie-Einstellungen" aria-hidden="true"><div>
     <div class="consent-copy"><p>Du entscheidest: Google Analytics misst Seitenaufrufe und die Nutzung der Registrierung. Google Ads misst die Nutzung im Zusammenhang mit Anzeigen. Beide Dienste laden erst nach deiner jeweiligen Zustimmung. Deine Auswahl kannst du jederzeit im Seitenfuß ändern. <a href="datenschutz.html">Datenschutzerklärung</a></p>

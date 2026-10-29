@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import { checkErrorPage } from './check_error_page.mjs';
 import { checkMeasurement } from './check_measurement.mjs';
 import { checkRegistration } from './check_registration.mjs';
+import { checkMotion } from './check_motion.mjs';
 
 const base = process.env.BASE_URL || 'http://127.0.0.1:8080';
 const executablePath = process.env.CHROME;
@@ -353,74 +354,6 @@ for (const [name, path, viewport] of captures) {
   await context.close();
 }
 
-// Mobile motion regression: forced motion must work even when the OS requests reduced motion.
-// The current homepage uses the in-place pseudonymization demo as its primary motion proof.
-{
-  const context = await browser.newContext({
-    viewport: { width: 390, height: 844 },
-    deviceScaleFactor: 1
-  });
-  const page = await context.newPage();
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto(base + '/de/?motion=1', { waitUntil: 'networkidle' });
-
-  const heroState = await page.evaluate(() => {
-    const root = document.documentElement;
-    const hero = document.querySelector('.home2-hero');
-    const headline = hero?.querySelector('h1');
-    const pilot = document.querySelector('a[href="#register"]');
-    return {
-      forced: root.classList.contains('motion-forced'),
-      ready: root.classList.contains('motion-ready'),
-      heroDisplay: hero ? getComputedStyle(hero).display : 'missing',
-      headlineOpacity: headline ? Number(getComputedStyle(headline).opacity) : 0,
-      pilotLabel: pilot?.textContent?.trim() || ''
-    };
-  });
-
-  if (!heroState.forced || !heroState.ready || heroState.heroDisplay === 'none' || heroState.headlineOpacity < 0.9) {
-    throw new Error('Customer-first mobile hero is not reliably visible under forced motion');
-  }
-  if (!heroState.pilotLabel.includes('Pilot starten')) {
-    throw new Error('Primary mobile CTA is not the pilot offer');
-  }
-
-  const demo = page.locator('[data-transform-demo]');
-  await demo.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(1250);
-
-  const motionState = await page.evaluate(() => {
-    const demo = document.querySelector('[data-transform-demo]');
-    const scan = document.querySelector('.transform-scan');
-    const values = Array.from(document.querySelectorAll('[data-transform-demo] .transform-value'));
-    const scanStyle = scan ? getComputedStyle(scan) : null;
-    return {
-      demoState: demo?.getAttribute('data-state') || 'missing',
-      scanAnimation: scanStyle?.animationName || 'missing',
-      scanDuration: scanStyle?.animationDuration || '0s',
-      scanIterations: scanStyle?.animationIterationCount || '0',
-      minimumValueOpacity: values.length ? Math.min(...values.map(el => Number(getComputedStyle(el).opacity))) : 0
-    };
-  });
-
-  console.log('forced mobile homepage motion', { heroState, motionState });
-  if (motionState.demoState !== 'processing') {
-    throw new Error('Pseudonymization demo did not enter processing state on mobile');
-  }
-  if (motionState.scanAnimation !== 'transformScan' || parseFloat(motionState.scanDuration) < 2) {
-    throw new Error('Forced mobile pseudonymization scan is not visibly animating');
-  }
-  if (motionState.minimumValueOpacity < 0.7) {
-    throw new Error('Homepage motion is hiding record content');
-  }
-
-  await page.screenshot({
-    path: '/tmp/psoydo-browser-qa/home-mobile-motion-forced.png',
-    fullPage: false
-  });
-  await context.close();
-}
-
 // In-place pseudonymization regression: the same record must transform while context remains unchanged.
 {
   const context = await browser.newContext({
@@ -497,5 +430,6 @@ for (const [name, path, viewport] of captures) {
 
 await checkErrorPage(browser);
 await checkRegistration(browser);
+await checkMotion(browser);
 await checkMeasurement(browser);
 await browser.close();
