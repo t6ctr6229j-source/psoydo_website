@@ -406,6 +406,7 @@
   var tallyOpen=document.getElementById('pilot-tally-open');
   var tallyClose=document.getElementById('pilot-tally-close');
   var tallyFrame=document.getElementById('pilot-tally-frame');
+  var tallyDirect=document.getElementById('pilot-tally-direct');
   var tallyContact=document.getElementById('pilot-contact');
   if(tallyOpen&&tallyClose&&tallyFrame&&tallyContact){
     var tallyStage=tallyOpen.closest('[data-tally-state]');
@@ -429,6 +430,7 @@
       frame.src=tallyURL; // Direct iframe load, no third-party widget script required.
       tallyFrame.hidden=false;
       tallyFrame.appendChild(frame);
+      if(tallyDirect)tallyDirect.hidden=false;
       tallyContact.classList.add('is-tally-open');
       tallyOpen.setAttribute('aria-expanded','true');
       tallyOpen.hidden=true;
@@ -438,6 +440,7 @@
     tallyClose.addEventListener('click',function(){
       tallyFrame.replaceChildren();
       tallyFrame.hidden=true;
+      if(tallyDirect)tallyDirect.hidden=true;
       tallyContact.classList.remove('is-tally-open');
       tallyOpen.hidden=false;
       tallyOpen.setAttribute('aria-expanded','false');
