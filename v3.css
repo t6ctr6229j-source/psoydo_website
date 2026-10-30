@@ -4651,39 +4651,22 @@ body.lightbox-open{overflow:hidden}
   .site-footer .footer-contact>div{align-items:flex-start}
 }
 
-/* Psoydo motion edition: a local sculpture, readable states and deliberate controls. */
+/* Psoydo motion edition: readable states and deliberate controls. */
 .motion-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
 .home2-hero-motion{padding-top:142px;padding-bottom:58px;isolation:isolate}
 .home2-hero-motion:before{width:700px;right:-440px;top:-240px;opacity:.5}
 .home2-hero-motion:after{display:none}
-.home2-hero-opening{display:grid;grid-template-columns:minmax(0,1.52fr) minmax(280px,1fr);gap:24px;align-items:center}
+.home2-hero-opening{display:block}
 .home2-hero-copy{position:relative;z-index:2;min-width:0}
-.home2-hero-motion h1{font-size:clamp(72px,7.4vw,116px);line-height:.89;max-width:12ch}
+.home2-hero-motion h1{font-size:clamp(72px,7.4vw,116px);line-height:.89;max-width:none}
 .home2-hero-motion h1 span{color:var(--v3-green)}
 .home2-hero-motion .home2-kicker{font-size:9px;line-height:1.6;letter-spacing:.11em;margin-bottom:28px}
 .home2-hero-motion .home2-hero-lower{margin-top:40px;gap:64px}
 .home2-hero-motion .home2-hero-lower p{font-size:clamp(18px,1.5vw,22px);line-height:1.55;max-width:850px}
 .home2-hero-motion .home2-hero-rule{margin-top:45px}
-.psoydo-sculpture-wrap{min-width:0;position:relative;align-self:stretch;display:flex;flex-direction:column;justify-content:center}
-.psoydo-sculpture{position:relative;width:100%;aspect-ratio:600/620;max-width:500px;margin:0 auto;perspective:1000px}
-.psoydo-sculpture:before{content:"";position:absolute;inset:10% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(93,245,184,.07),transparent 67%);pointer-events:none}
-.psoydo-sculpture-tilt{height:100%;transform:rotateX(var(--sculpture-turn-x,0deg)) rotateY(var(--sculpture-turn-y,0deg));transition:transform .5s cubic-bezier(.2,.7,.25,1);transform-style:preserve-3d}
-.psoydo-sculpture-native{display:block;width:100%;height:100%;overflow:visible}
-.psoydo-sculpture-depth,.psoydo-sculpture-middle,.psoydo-sculpture-face,.psoydo-sculpture-orbit{transform-box:fill-box;transform-origin:center;animation-play-state:paused}
-.psoydo-sculpture-depth{transform:translate(23px,-14px);animation:psoydoDepth 9s ease-in-out infinite paused}
-.psoydo-sculpture-middle{transform:translate(11px,-7px);animation:psoydoMiddle 9s ease-in-out infinite paused}
-.psoydo-sculpture-face{transform:translate(-8px,6px);animation:psoydoFace 9s ease-in-out infinite paused}
-.psoydo-sculpture-orbit{animation:psoydoOrbit 18s ease-in-out infinite alternate paused}
-.psoydo-sculpture-shadow{transform-origin:center;animation:psoydoShadow 9s ease-in-out infinite paused}
-html[data-motion="running"] [data-psoydo-sculpture][data-motion-in-view="true"] .psoydo-sculpture-depth,
-html[data-motion="running"] [data-psoydo-sculpture][data-motion-in-view="true"] .psoydo-sculpture-middle,
-html[data-motion="running"] [data-psoydo-sculpture][data-motion-in-view="true"] .psoydo-sculpture-face,
-html[data-motion="running"] [data-psoydo-sculpture][data-motion-in-view="true"] .psoydo-sculpture-orbit,
-html[data-motion="running"] [data-psoydo-sculpture][data-motion-in-view="true"] .psoydo-sculpture-shadow{animation-play-state:running}
-.psoydo-sculpture-code{position:absolute;bottom:10%;right:0;font:500 10px/1.4 var(--mono);letter-spacing:.12em;color:#92bca8;writing-mode:vertical-rl}
-.psoydo-sculpture-caption{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:0 6px 0 8%;padding-top:15px;border-top:1px solid rgba(93,245,184,.2)}
-.psoydo-sculpture-caption>span{font:400 10px/1.7 var(--mono);color:#a0b9ad;letter-spacing:.02em}
-.psoydo-sculpture-caption b{font-weight:500;color:#d5f5e4}
+.home2-motion-caption{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:28px 0 0;padding-top:15px;border-top:1px solid rgba(93,245,184,.2)}
+.home2-motion-caption>span{font:400 10px/1.7 var(--mono);color:#a0b9ad;letter-spacing:.02em}
+.home2-motion-caption b{font-weight:500;color:#d5f5e4}
 .motion-toggle{display:inline-flex;gap:9px;align-items:center;justify-content:center;min-height:44px;padding:8px 11px;border:1px solid rgba(186,244,214,.24);border-radius:999px;background:transparent;color:#c0d8cb;font:500 10px/1.35 var(--mono);text-align:left;cursor:pointer}
 .motion-toggle i{position:relative;flex:0 0 auto;display:block;width:9px;height:10px;border-left:2px solid currentColor;border-right:2px solid currentColor;box-sizing:border-box}
 .motion-toggle[aria-pressed="true"] i{height:0;width:0;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left:7px solid currentColor;border-right:0}
@@ -4691,12 +4674,6 @@ html[data-motion="running"] [data-psoydo-sculpture][data-motion-in-view="true"] 
 .motion-toggle:focus-visible{outline:2px solid var(--v3-green);outline-offset:4px}
 .motion-toggle:disabled{cursor:default;opacity:.85}
 .motion-toggle[hidden],.transform-controls[hidden],.footer-alias[hidden],.footer-alias [hidden]{display:none!important}
-@keyframes psoydoDepth{0%,100%{transform:translate(23px,-14px) rotate(1deg)}50%{transform:translate(34px,-22px) rotate(3deg)}}
-@keyframes psoydoMiddle{0%,100%{transform:translate(11px,-7px) rotate(.5deg)}50%{transform:translate(8px,4px) rotate(-1.5deg)}}
-@keyframes psoydoFace{0%,100%{transform:translate(-8px,6px) rotate(-1.5deg)}50%{transform:translate(-19px,-5px) rotate(-3.5deg)}}
-@keyframes psoydoOrbit{from{transform:rotate(-6deg)}to{transform:rotate(11deg)}}
-@keyframes psoydoShadow{0%,100%{transform:scaleX(1);opacity:.8}50%{transform:scaleX(.84);opacity:.55}}
-
 /* The one-record demonstration stays in the reader's chosen state after its first pass. */
 .transform-head>*,.home2-pilot-grid>*{min-width:0;max-width:100%}
 .transform-head h2,.home2-pilot-copy h2{overflow-wrap:anywhere;hyphens:auto}
@@ -4741,26 +4718,18 @@ html[data-motion="hidden"] *,html[data-motion="hidden"] *:before,html[data-motio
 html[data-motion="paused"] *,html[data-motion="hidden"] *{transition-duration:0s!important}
 html[data-motion="paused"] .page-progress,html[data-motion="hidden"] .page-progress{display:none}
 .motion-ready .process-rail .process-row,.motion-ready .control-layers .control-layer,.motion-ready .impact-list .impact-case{opacity:1;transform:none;animation:none}
-@media(min-width:1600px){.home2-hero-motion{padding-top:155px}.psoydo-sculpture{max-width:500px}}
+@media(min-width:1600px){.home2-hero-motion{padding-top:155px}}
 @media(max-width:1180px){
-  .home2-hero-opening{grid-template-columns:minmax(0,1.4fr) minmax(230px,1fr);gap:20px}
   .home2-hero-motion h1{font-size:clamp(64px,7.1vw,88px)}
-  .psoydo-sculpture-caption{margin-left:4%;gap:10px;flex-wrap:wrap}
   .home2-hero-motion .home2-hero-lower{gap:40px}
 }
 @media(max-width:780px){
   .home2-hero-motion{padding-top:114px;padding-bottom:42px;min-height:0}
-  .home2-hero-opening{grid-template-columns:1fr;gap:5px}
   .home2-hero-motion h1{font-size:clamp(58px,11.4vw,86px);max-width:14ch;line-height:.94}
   .home2-hero-motion .home2-kicker{font-size:8px;letter-spacing:.07em;margin-bottom:24px}
-  .psoydo-sculpture-wrap{margin:0 auto;width:min(100%,390px)}
-  .psoydo-sculpture{max-width:310px;aspect-ratio:600/540;margin-top:-4px;margin-bottom:-9px}
-  .psoydo-sculpture-native{height:100%;overflow:visible}
-  .psoydo-sculpture-code{right:2%;font-size:8px}
-  .psoydo-sculpture-caption{margin:0;flex-wrap:nowrap;padding-top:12px;gap:16px}
-  .psoydo-sculpture-caption>span{font-size:9px}
-  .psoydo-sculpture-caption .motion-toggle{font-size:9px;padding:8px 10px;max-width:174px}
-  .psoydo-sculpture-depth,.psoydo-sculpture-middle,.psoydo-sculpture-face,.psoydo-sculpture-orbit,.psoydo-sculpture-shadow{animation-duration:5s;animation-iteration-count:1}
+  .home2-motion-caption{margin:24px 0 0;flex-wrap:nowrap;padding-top:12px;gap:16px}
+  .home2-motion-caption>span{font-size:9px}
+  .home2-motion-caption .motion-toggle{font-size:9px;padding:8px 10px;max-width:174px}
   .home2-hero-motion .home2-hero-lower{margin-top:32px;gap:25px}
   .home2-hero-motion .home2-hero-actions{order:-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:16px}
   .home2-hero-motion .home2-hero-lower p{font-size:17px;line-height:1.6}
@@ -4779,6 +4748,5 @@ html[data-motion="paused"] .page-progress,html[data-motion="hidden"] .page-progr
 }
 @media(prefers-reduced-motion:reduce){
   html *,html *:before,html *:after{animation:none!important;transition-duration:0s!important;scroll-behavior:auto!important}
-  .psoydo-sculpture-tilt{transform:none!important}
   .transform-scan,.page-progress{display:none!important}
 }

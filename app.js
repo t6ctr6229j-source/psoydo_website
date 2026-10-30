@@ -150,36 +150,6 @@
   window.addEventListener('resize',updateProgress,{passive:true});
   motionListeners.push(updateProgress);
 
-  // A local SVG sculpture is the complete baseline. There is no remote scene dependency.
-  var sculpture=document.querySelector('[data-psoydo-sculpture]');
-  if(sculpture){
-    watchMotion(sculpture);
-    var sculptureFrame=0;
-    var sculpturePoint=null;
-    var sculpturePointer=window.matchMedia('(hover:hover) and (pointer:fine)');
-    function resetSculpture(){
-      if(sculptureFrame)window.cancelAnimationFrame(sculptureFrame);
-      sculptureFrame=0;
-      sculpturePoint=null;
-      sculpture.style.removeProperty('--sculpture-turn-x');
-      sculpture.style.removeProperty('--sculpture-turn-y');
-    }
-    sculpture.parentElement.addEventListener('pointermove',function(event){
-      if(!sculpturePointer.matches||!elementCanMove(sculpture))return;
-      var bounds=sculpture.getBoundingClientRect();
-      sculpturePoint={x:Math.max(-1,Math.min(1,(event.clientX-bounds.left)/bounds.width*2-1)),y:Math.max(-1,Math.min(1,(event.clientY-bounds.top)/bounds.height*2-1))};
-      if(sculptureFrame)return;
-      sculptureFrame=window.requestAnimationFrame(function(){
-        sculptureFrame=0;
-        if(!sculpturePoint||!elementCanMove(sculpture))return;
-        sculpture.style.setProperty('--sculpture-turn-x',(-sculpturePoint.y*4).toFixed(2)+'deg');
-        sculpture.style.setProperty('--sculpture-turn-y',(sculpturePoint.x*5).toFixed(2)+'deg');
-      });
-    },{passive:true});
-    sculpture.parentElement.addEventListener('pointerleave',resetSculpture);
-    motionListeners.push(function(){if(!elementCanMove(sculpture))resetSculpture();});
-  }
-
   // One fictional record, one automatic pass, then visitor-controlled changes.
   var transformDemo=document.querySelector('[data-transform-demo]');
   if(transformDemo){
