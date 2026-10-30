@@ -1,2 +1,5 @@
 dist/
 __pycache__/
+cf-dist/
+.wrangler/
+node_modules/

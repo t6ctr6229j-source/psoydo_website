@@ -48,6 +48,8 @@ def validate(files):
                       else file.parent / unquote(parsed.path))
             if parsed.path.endswith('/'):
                 target /= 'index.html'
+            elif not target.suffix and target.with_suffix('.html').is_file():
+                target = target.with_suffix('.html')
             if target.resolve() not in allowed:
                 raise ValueError(f'{file.relative_to(ROOT)} references unpackaged file: {ref}')
     # The error page resolves its logo and styles in JS; these must remain present.

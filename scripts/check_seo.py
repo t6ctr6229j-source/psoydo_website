@@ -5,18 +5,31 @@ import json
 from pathlib import Path
 import re
 import subprocess
+from datetime import date
+from urllib.parse import urlsplit
 ROOT=Path(__file__).resolve().parents[1]
 def plain(s): return ' '.join(html.unescape(re.sub('<[^>]+>',' ',s)).split())
 entities={}
 for page in sorted((ROOT/'de').glob('*.html')):
     text=page.read_text()
-    canonical='https://psoydo.com/de/'+('' if page.name=='index.html' else page.name)
+    canonical='https://psoydo.com/de/'+('' if page.name=='index.html' else page.stem)
     assert f'rel="canonical" href="{canonical}"' in text, page.name
+    assert f'property="og:url" content="{canonical}"' in text, (page.name,'Open Graph URL drift')
+    assert not re.search(r'https://(?:www\.)?psoydo\.com/[^\s"<>]*\.html',text), (page.name,'noncanonical owned URL')
+    for href in re.findall(r'href="([^"]+)"',text):
+        link=urlsplit(html.unescape(href))
+        if not link.netloc and not link.scheme:
+            assert not link.path.endswith('.html'), (page.name,'redirecting internal link',href)
     assert 'hreflang="en"' not in text and 'href="/en/' not in text, page.name
     graph=json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>',text,re.S)[1])['@graph']
     ids=[n['@id'] for n in graph if '@id' in n]
     assert len(ids)==len(set(ids)), (page.name,'duplicate entity')
     for node in graph:
+        if node.get('@type') in ['WebPage','Article','CollectionPage']:
+            page_url=node.get('url') or node.get('mainEntityOfPage')
+            assert page_url==canonical, (page.name,'schema page URL',page_url)
+        if 'dateModified' in node:
+            assert date.fromisoformat(node['dateModified'])<=date.today(), (page.name,'future modification date')
         if node.get('@type')=='Organization':
             assert node.get('@id')=='https://wescaleit.com/#organization', (page.name,'corporate entity id')
             assert node['name']=='wescaleIT AG'
@@ -53,4 +66,9 @@ assert 'typeform' not in (ROOT/'app.js').read_text().lower()
 assert 'mailto:info@wescaleit.com?subject=Psoydo%20Pilotanfrage' in (ROOT/'de/index.html').read_text()
 assert 'data-tally-form="KppMYg"' in (ROOT/'de/index.html').read_text()
 assert 'pilot-tally-open' in (ROOT/'app.js').read_text()
-print('SEO semantics passed: canonicals, entity consistency, net pilot terms, article dates, visible FAQ parity, contact and retired form guard.')
+for name in ['index','produkt','architektur','preise']:
+    visible=plain((ROOT/'de'/f'{name}.html').read_text())
+    assert 'Jahreslizenz' in visible and 'Laptops oder Servern' in visible, (name,'customer installation / license drift')
+    assert 'SaaS-Demo' in visible, (name,'limited pilot distinction missing')
+    assert 'STATUS: ARCHITEKTURZIEL' not in visible, (name,'retired operating-model ambiguity')
+print('SEO semantics passed: extensionless canonicals/links/schema, entity consistency, licensed customer installation, limited pilot, article dates and visible FAQ parity.')

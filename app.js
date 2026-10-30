@@ -474,7 +474,7 @@
   var tallyContact=document.getElementById('pilot-contact');
   if(tallyOpen&&tallyClose&&tallyFrame&&tallyContact){
     var tallyStage=tallyOpen.closest('[data-tally-state]');
-    var lastPilotSubmissionId='';
+    var pilotSubmissionIds=new Set();
     var tallyURL='https://tally.so/embed/KppMYg?alignLeft=1&hideTitle=1&transparentBackground=1&dynamicHeight=1';
     // Hide the email-first fallback only once the interactive form is ready.
     if(tallyStage&&tallyStage.dataset.tallyState==='published'){
@@ -527,10 +527,14 @@
         if(Number.isFinite(height)&&height>300&&height<6000)frame.height=String(Math.ceil(height));
         return;
       }
-      if(message.event!=='Tally.FormSubmitted'||!payload.id||
-         payload.id===lastPilotSubmissionId)return;
-      lastPilotSubmissionId=payload.id;
-      if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_form_submitted');
+      if(message.event!=='Tally.FormSubmitted'||typeof payload.id!=='string'||!payload.id||
+         pilotSubmissionIds.has(payload.id))return;
+      // IDs stay in this document only; they and the form answers never reach Google.
+      pilotSubmissionIds.add(payload.id);
+      if(window.__psoydoTrack){
+        window.__psoydoTrack('psoydo_pilot_form_submitted');
+        window.__psoydoTrack('generate_lead');
+      }
     });
   }
   var pilotEmail=document.getElementById('pilot-email');
@@ -661,12 +665,28 @@
     try{var url=new URL(value);return url.origin+url.pathname;}catch(error){return '';}
   }
 
+  function externalReferrer(value){
+    try{
+      var url=new URL(value);
+      if(!/^https?:$/.test(url.protocol)||/^(www\.)?psoydo\.com$/.test(url.hostname))return '';
+      return url.origin;
+    }catch(error){return '';}
+  }
+
+  var measurementEvents=['psoydo_pilot_form_open','psoydo_pilot_form_submitted','psoydo_pilot_email_click','generate_lead'];
   window.__psoydoTrack=function(name){
+    if(measurementEvents.indexOf(name)===-1)return;
     if(current.expires<=Date.now()){stopMeasurement();return;}
     if(!production||!configured||typeof window.gtag!=='function')return;
-    if(current.analytics)window.gtag('event',name,{
-      send_to:GA,event_category:'registration',event_label:'pilot_inquiry'
-    });
+    if(current.analytics){
+      var parameters={send_to:GA,event_category:'registration',event_label:'pilot_inquiry'};
+      if(name==='generate_lead'){
+        parameters.lead_source='pilot_form';
+        parameters.form_id='KppMYg';
+        parameters.method='tally';
+      }
+      window.gtag('event',name,parameters);
+    }
   };
 
   function loadMeasurement(choice){
@@ -687,7 +707,7 @@
     });
     window.gtag('js',new Date());
     window.gtag('set',{
-      page_location:cleanURL(location.href),page_referrer:cleanURL(document.referrer),
+      page_location:cleanURL(location.href),page_referrer:externalReferrer(document.referrer),
       allow_ad_personalization_signals:false
     });
     if(choice.analytics)window.gtag('config',GA,{

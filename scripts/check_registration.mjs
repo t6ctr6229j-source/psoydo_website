@@ -11,7 +11,7 @@ export async function checkRegistration(browser) {
       await context.route('**/*',async route=>{
         const url=new URL(route.request().url());
         if(url.hostname!=='psoydo.com'){external.push(url.hostname);return route.abort();}
-        const path=url.pathname.endsWith('/')?url.pathname+'index.html':url.pathname;
+        const path=url.pathname.endsWith('/')?url.pathname+'index.html':/^\/de\/[a-z0-9-]+$/.test(url.pathname)?url.pathname+'.html':url.pathname;
         return route.fulfill({path:fileURLToPath(new URL(path.slice(1),root))});
       });
       const page=await context.newPage();
@@ -74,7 +74,7 @@ export async function checkRegistration(browser) {
             source:iframe.contentWindow,data:payload}));
           return captured;
         });
-        assert.deepEqual(events,['psoydo_pilot_form_submitted'],
+        assert.deepEqual(events,['psoydo_pilot_form_submitted','generate_lead'],
           'Only a valid first form submission should be counted, without personal answers');
         assert.equal(await frame.getAttribute('height'),'1120',
           'A verified Tally resize must be honored');

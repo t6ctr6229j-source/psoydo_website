@@ -110,6 +110,8 @@ def local_target(page: Path, ref: str) -> Path | None:
         candidate = page.parent / path
     if str(path).endswith("/"):
         candidate = candidate / "index.html"
+    elif not candidate.suffix and candidate.with_suffix('.html').is_file():
+        candidate = candidate.with_suffix('.html')
     return candidate.resolve()
 
 
@@ -271,11 +273,11 @@ def main() -> int:
             fail(errors, f"{rel}: expected at least {minimum} screenshot lightbox trigger(s)")
 
     expected_primary_nav = [
-        ("produkt.html", "Produkt"),
-        ("anwendungsfaelle.html", "Use Cases"),
-        ("sicherheit.html", "Sicherheit"),
-        ("preise.html", "Preise"),
-        ("insights.html", "Insights"),
+        ("produkt", "Produkt"),
+        ("anwendungsfaelle", "Use Cases"),
+        ("sicherheit", "Sicherheit"),
+        ("preise", "Preise"),
+        ("insights", "Insights"),
     ]
     for page in PUBLIC_HTML:
         if not page.exists():
@@ -367,7 +369,7 @@ def main() -> int:
     for price in EXPECTED_PRICES:
         if price not in pricing:
             fail(errors, f"de/preise.html: expected price missing: {price}")
-    for phrase in ["keine automatische Verlängerung", "30 Tage", "Cloud"]:
+    for phrase in ["keine automatische Verlängerung", "30 Tage", "SaaS-Demoumgebung", "Jahreslizenzen", "Laptops oder Servern"]:
         if phrase.lower() not in pricing.lower():
             fail(errors, f"de/preise.html: test-license guardrail missing: {phrase}")
 
@@ -384,14 +386,14 @@ def main() -> int:
     sitemap = ROOT / "sitemap.xml"
     expected_sitemap_urls = [
         "https://psoydo.com/de/",
-        "https://psoydo.com/de/produkt.html",
-        "https://psoydo.com/de/technologie.html",
-        "https://psoydo.com/de/architektur.html",
-        "https://psoydo.com/de/anwendungsfaelle.html",
-        "https://psoydo.com/de/sicherheit.html",
-        "https://psoydo.com/de/preise.html",
+        "https://psoydo.com/de/produkt",
+        "https://psoydo.com/de/technologie",
+        "https://psoydo.com/de/architektur",
+        "https://psoydo.com/de/anwendungsfaelle",
+        "https://psoydo.com/de/sicherheit",
+        "https://psoydo.com/de/preise",
     ]
-    expected_sitemap_urls += ["https://psoydo.com/de/" + page.name for page in INSIGHTS_HTML]
+    expected_sitemap_urls += ["https://psoydo.com/de/" + page.stem for page in INSIGHTS_HTML]
     if sitemap.exists():
         sitemap_text = sitemap.read_text(encoding="utf-8")
         actual_urls = re.findall(r"<loc>(.*?)</loc>", sitemap_text)

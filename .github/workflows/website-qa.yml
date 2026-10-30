@@ -36,13 +36,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Static site QA
         run: python scripts/qa_site.py
       - name: Check visible authorship and article dates
         run: python scripts/check_authorship.py
       - name: SEO semantics
         run: python scripts/check_seo.py
-      - name: Production Apache routing
+      - name: Apache fallback routing
         run: |
           python scripts/build_release.py
           if ! command -v apache2 >/dev/null; then sudo apt-get update -qq && sudo apt-get install -y apache2; fi
@@ -51,21 +55,29 @@ jobs:
         run: node --check app.js
       - name: Start local site
         run: |
-          python -m http.server 8080 >/tmp/psoydo-http.log 2>&1 &
+          sh scripts/build-cloudflare-pages.sh
+          npm install --prefix /tmp/psoydo-pages-runtime --no-save --no-package-lock wrangler@4.156.0
+          WRANGLER_SEND_METRICS=false /tmp/psoydo-pages-runtime/node_modules/.bin/wrangler pages dev cf-dist --ip 127.0.0.1 --port 8080 --compatibility-date 2026-10-01 >/tmp/psoydo-http.log 2>&1 &
           echo $! > /tmp/psoydo-http.pid
-          sleep 2
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8080/de/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/ >/dev/null
+      - name: Cloudflare Pages canonical routes
+        run: python scripts/check_pages_routes.py
       - name: Smoke test public pages
         run: |
           curl --fail --silent --show-error http://127.0.0.1:8080/de/ >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/produkt.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/technologie.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/architektur.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/anwendungsfaelle.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/sicherheit.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/preise.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/impressum.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/de/datenschutz.html >/dev/null
-          curl --fail --silent --show-error http://127.0.0.1:8080/404.html >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/produkt >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/technologie >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/architektur >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/anwendungsfaelle >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/sicherheit >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/preise >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/impressum >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/de/datenschutz >/dev/null
+          curl --fail --silent --show-error http://127.0.0.1:8080/404 >/dev/null
 
       - name: Lighthouse browser audits
         if: github.event_name == 'pull_request'
@@ -73,15 +85,15 @@ jobs:
           mkdir -p /tmp/psoydo-browser-qa
           npx --yes lighthouse http://127.0.0.1:8080/de/             --output=json --output-path=/tmp/psoydo-browser-qa/home-mobile.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
           npx --yes lighthouse http://127.0.0.1:8080/de/             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/home-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/produkt.html             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/product-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/technologie.html             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/technology-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/architektur.html             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/architecture-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/anwendungsfaelle.html             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/usecases-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/sicherheit.html             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/security-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/preise.html             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/pricing-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/produkt             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/product-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/technologie             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/technology-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/architektur             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/architecture-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/anwendungsfaelle             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/usecases-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/sicherheit             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/security-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/preise             --preset=desktop             --output=json --output-path=/tmp/psoydo-browser-qa/pricing-desktop.json             --only-categories=performance,accessibility,best-practices,seo             --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
 
-          npx --yes lighthouse http://127.0.0.1:8080/de/insights.html --output=json --output-path=/tmp/psoydo-browser-qa/insights-mobile.json --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
-          npx --yes lighthouse http://127.0.0.1:8080/de/ki-pseudonymisierung.html --preset=desktop --output=json --output-path=/tmp/psoydo-browser-qa/article-desktop.json --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/insights --output=json --output-path=/tmp/psoydo-browser-qa/insights-mobile.json --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
+          npx --yes lighthouse http://127.0.0.1:8080/de/ki-pseudonymisierung --preset=desktop --output=json --output-path=/tmp/psoydo-browser-qa/article-desktop.json --only-categories=performance,accessibility,best-practices,seo --chrome-flags="--headless --no-sandbox --disable-dev-shm-usage" --quiet
 
       - name: Assert Lighthouse floors
         if: github.event_name == 'pull_request'

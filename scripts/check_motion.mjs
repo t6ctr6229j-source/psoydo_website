@@ -11,7 +11,7 @@ async function openLocal(browser,options={}) {
   await context.route('**/*',async route=>{
     const url=new URL(route.request().url());
     if(url.hostname!=='psoydo.com'){external.push(url.href);return route.abort();}
-    const path=url.pathname.endsWith('/')?url.pathname+'index.html':url.pathname;
+    const path=url.pathname.endsWith('/')?url.pathname+'index.html':/^\/de\/[a-z0-9-]+$/.test(url.pathname)?url.pathname+'.html':url.pathname;
     return route.fulfill({path:fileURLToPath(new URL(path.slice(1),root))});
   });
   const page=await context.newPage();

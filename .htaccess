@@ -1,17 +1,26 @@
-# United Domains production routing. GitHub Pages ignores this file.
+# Apache fallback routing, aligned with Cloudflare Pages public URLs.
 RewriteEngine On
 # Retired English pages have equivalent German successors. Keep unknown URLs as 404.
 RewriteRule ^en/?$ https://psoydo.com/de/ [R=301,L]
 RewriteRule ^en/index\.html$ https://psoydo.com/de/ [R=301,L]
-RewriteRule ^en/(datenschutz|impressum)\.html$ https://psoydo.com/de/$1.html [R=301,L]
+RewriteRule ^en/(datenschutz|impressum)(?:\.html)?$ https://psoydo.com/de/$1 [R=301,L]
 # Root and explicit index aliases go straight to the canonical content URL.
 RewriteRule ^(?:index\.html)?$ https://psoydo.com/de/ [R=301,L]
 RewriteRule ^de$ https://psoydo.com/de/ [R=301,L]
 RewriteCond %{THE_REQUEST} \s/+de/index\.html[?\s] [NC]
 RewriteRule ^de/index\.html$ https://psoydo.com/de/ [R=301,L]
+# Legacy HTML URLs redirect; internal rewrites must not redirect back to themselves.
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteCond %{THE_REQUEST} \s/+de/[a-z0-9-]+\.html[?\s] [NC]
+RewriteRule ^de/([a-z0-9-]+)\.html$ https://psoydo.com/de/$1 [R=301,L,NE]
 # Preserve paths and query strings when normalizing the www hostname.
 RewriteCond %{HTTP_HOST} ^www\.psoydo\.com(?::[0-9]+)?$ [NC]
 RewriteRule ^ https://psoydo.com%{REQUEST_URI} [R=301,L,NE]
+# Physical source files keep .html; public canonical URLs omit it.
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^de/([a-z0-9-]+)$ de/$1.html [L]
 # HTTPS is enforced by the hosting proxy; avoid a second proxy-dependent rule.
 ErrorDocument 404 /404.html
 
