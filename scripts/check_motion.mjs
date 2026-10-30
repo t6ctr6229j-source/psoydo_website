@@ -38,11 +38,10 @@ export async function checkMotion(browser) {
   for(const width of [320,390,768,1440]) {
     const {context,page}=await openLocal(browser,{viewport:{width,height:900},javaScriptEnabled:false});
     assert.equal(await page.locator('h1').isVisible(),true);
-    assert.equal(await page.locator('[data-native-sculpture]').isVisible(),true);
+    assert.equal(await page.locator('[data-native-sculpture],[data-psoydo-sculpture]').count(),0);
     assert.equal(await page.locator('[data-transform-controls]').isHidden(),true);
     assert.equal(await page.locator('[data-alias-egg]').isHidden(),true);
     assert.equal(await page.locator('#pilot-tally-email-cta').isVisible(),true);
-    assert.equal(await page.locator('.psoydo-sculpture-face').evaluate(element=>getComputedStyle(element).animationPlayState),'paused');
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true,'No-JS overflow at '+width);
     const visibleCopy=await page.locator('.home2-hero h1').evaluate(element=>getComputedStyle(element).opacity);
     assert.equal(Number(visibleCopy),1);
@@ -55,7 +54,7 @@ export async function checkMotion(browser) {
     const {context,page,external,errors}=await openLocal(browser,{viewport:{width,height:900},reducedMotion:'reduce'});
     assert.equal(await page.locator('html').getAttribute('data-motion'),'reduced');
     assert.equal(await page.locator('[data-motion-toggle]').first().isDisabled(),true);
-    assert.equal(await page.locator('.psoydo-sculpture-face').evaluate(element=>getComputedStyle(element).animationName),'none');
+    assert.equal(await page.locator('.transform-scan').isHidden(),true);
     await page.evaluate(()=>{window.__motionRecord=document.querySelector('.transform-record');});
     const original=page.locator('[data-transform-mode="original"]');
     const protect=page.locator('[data-transform-mode="safe"]');
@@ -76,28 +75,19 @@ export async function checkMotion(browser) {
     await alias.press('Enter');
     assert.equal(await page.locator('[data-alias-label]').textContent(),'PSOYDO');
     assert.equal(await page.locator('[data-alias-note]').isHidden(),true);
-    assert.deepEqual(external,[],'The sculpture and Easter egg must not contact external services');
+    assert.deepEqual(external,[],'The demo and Easter egg must not contact external services');
     assert.deepEqual(errors,[]);
     await page.screenshot({path:output+'/motion-alias-'+width+'.png'});
     await context.close();
   }
 
   const {context,page,external,errors}=await openLocal(browser,{reducedMotion:'no-preference'});
-  const face=page.locator('.psoydo-sculpture-face');
-  const sculpture=page.locator('[data-psoydo-sculpture]');
-  await page.waitForFunction(()=>document.querySelector('[data-psoydo-sculpture]').getAttribute('data-motion-in-view')==='true');
-  assert.equal(await face.evaluate(element=>getComputedStyle(element).animationPlayState),'running');
-  const firstTransform=await face.evaluate(element=>getComputedStyle(element).transform);
-  await page.waitForTimeout(220);
-  assert.notEqual(await face.evaluate(element=>getComputedStyle(element).transform),firstTransform,'The hero sculpture actually moves');
   await page.screenshot({path:output+'/motion-hero-desktop.png'});
 
-  await page.locator('[data-motion-toggle]').first().click();
+  await page.locator('.home2-motion-caption [data-motion-toggle]').click();
   assert.equal(await page.locator('html').getAttribute('data-motion'),'paused');
-  const pausedTransform=await face.evaluate(element=>getComputedStyle(element).transform);
-  await page.waitForTimeout(260);
-  assert.equal(await face.evaluate(element=>getComputedStyle(element).transform),pausedTransform,'Pause must stop the visible shape');
-  await page.locator('[data-motion-toggle]').first().click();
+  await page.locator('.home2-motion-caption [data-motion-toggle]').click();
+  assert.equal(await page.locator('html').getAttribute('data-motion'),'running');
 
   const demo=page.locator('[data-transform-demo]');
   await demo.scrollIntoViewIfNeeded();
@@ -108,11 +98,16 @@ export async function checkMotion(browser) {
   await page.waitForTimeout(420);
   assert.deepEqual(await recordState(page),pausedRecord,'Paused record values must remain stable');
   await demoPause.click();
+  await page.locator('.home2-hero h1').scrollIntoViewIfNeeded();
+  await page.waitForFunction(()=>document.querySelector('[data-transform-demo]').getAttribute('data-motion-in-view')==='false');
+  assert.equal(await demo.getAttribute('data-playback'),'paused','Offscreen motion must stop');
+  const offscreenRecord=await recordState(page);
+  await page.waitForTimeout(260);
+  assert.deepEqual(await recordState(page),offscreenRecord,'Offscreen record values must remain stable');
+  await demo.scrollIntoViewIfNeeded();
   await page.waitForFunction(()=>document.querySelector('[data-transform-demo]').getAttribute('data-state')==='safe');
   assert.deepEqual((await recordState(page)).values,['PERSON_041','MAIL_018','REF_7Q2M9']);
   assert.deepEqual((await recordState(page)).context,['Radiologie','Gerätefreigabe']);
-  assert.equal(await sculpture.getAttribute('data-motion-in-view'),'false');
-  assert.equal(await face.evaluate(element=>getComputedStyle(element).animationPlayState),'paused','Offscreen motion must stop');
   await page.locator('[data-transform-mode="original"]').click();
   await page.waitForTimeout(3500);
   assert.equal((await recordState(page)).state,'original','The automatic pass must not restart after a visitor chooses Original');
