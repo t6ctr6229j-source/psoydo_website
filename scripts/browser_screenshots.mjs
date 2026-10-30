@@ -17,27 +17,27 @@ const browser = await chromium.launch({
 const captures = [
   ['home-desktop', '/de/', { width: 1440, height: 900 }],
   ['home-mobile', '/de/', { width: 390, height: 844 }],
-  ['product-desktop', '/de/produkt.html', { width: 1440, height: 900 }],
-  ['product-mobile', '/de/produkt.html', { width: 390, height: 844 }],
-  ['technology-desktop', '/de/technologie.html', { width: 1440, height: 900 }],
-  ['technology-mobile', '/de/technologie.html', { width: 390, height: 844 }],
-  ['architecture-desktop', '/de/architektur.html', { width: 1440, height: 900 }],
-  ['architecture-mobile', '/de/architektur.html', { width: 390, height: 844 }],
-  ['usecases-desktop', '/de/anwendungsfaelle.html', { width: 1440, height: 900 }],
-  ['usecases-mobile', '/de/anwendungsfaelle.html', { width: 390, height: 844 }],
-  ['security-desktop', '/de/sicherheit.html', { width: 1440, height: 900 }],
-  ['security-mobile', '/de/sicherheit.html', { width: 390, height: 844 }],
-  ['pricing-desktop', '/de/preise.html', { width: 1440, height: 900 }],
-  ['pricing-mobile', '/de/preise.html', { width: 390, height: 844 }],
-  ['imprint-desktop', '/de/impressum.html', { width: 1440, height: 900 }],
-  ['imprint-mobile', '/de/impressum.html', { width: 390, height: 844 }],
-  ['privacy-desktop', '/de/datenschutz.html', { width: 1440, height: 900 }],
-  ['privacy-mobile', '/de/datenschutz.html', { width: 390, height: 844 }]
+  ['product-desktop', '/de/produkt', { width: 1440, height: 900 }],
+  ['product-mobile', '/de/produkt', { width: 390, height: 844 }],
+  ['technology-desktop', '/de/technologie', { width: 1440, height: 900 }],
+  ['technology-mobile', '/de/technologie', { width: 390, height: 844 }],
+  ['architecture-desktop', '/de/architektur', { width: 1440, height: 900 }],
+  ['architecture-mobile', '/de/architektur', { width: 390, height: 844 }],
+  ['usecases-desktop', '/de/anwendungsfaelle', { width: 1440, height: 900 }],
+  ['usecases-mobile', '/de/anwendungsfaelle', { width: 390, height: 844 }],
+  ['security-desktop', '/de/sicherheit', { width: 1440, height: 900 }],
+  ['security-mobile', '/de/sicherheit', { width: 390, height: 844 }],
+  ['pricing-desktop', '/de/preise', { width: 1440, height: 900 }],
+  ['pricing-mobile', '/de/preise', { width: 390, height: 844 }],
+  ['imprint-desktop', '/de/impressum', { width: 1440, height: 900 }],
+  ['imprint-mobile', '/de/impressum', { width: 390, height: 844 }],
+  ['privacy-desktop', '/de/datenschutz', { width: 1440, height: 900 }],
+  ['privacy-mobile', '/de/datenschutz', { width: 390, height: 844 }]
 ];
 
 for (const slug of ["insights", "ki-pseudonymisierung", "anonymisierung-vs-pseudonymisierung", "personenbezogene-daten-ki", "geschaeftsgeheimnisse-ki", "ki-on-premises-private-cloud", "ki-vertragsanalyse", "ki-support-tickets", "ki-log-analyse", "ki-finanzberichte", "ki-mitarbeiterfeedback", "ki-klinikverwaltung"]) {
-  captures.push([slug + '-desktop', '/de/' + slug + '.html', {width:1440,height:900}]);
-  captures.push([slug + '-mobile', '/de/' + slug + '.html', {width:390,height:844}]);
+  captures.push([slug + '-desktop', '/de/' + slug, {width:1440,height:900}]);
+  captures.push([slug + '-mobile', '/de/' + slug, {width:390,height:844}]);
 }
 
 for (const [name, path, viewport] of captures) {
@@ -62,7 +62,7 @@ for (const [name, path, viewport] of captures) {
     throw new Error(name + ': horizontal overflow');
   }
   // Regression coverage for the visual defects reported in acceptance screenshots.
-  if (path === '/de/anwendungsfaelle.html') {
+  if (path === '/de/anwendungsfaelle') {
     const titles = await page.evaluate(() =>
       Array.from(document.querySelectorAll('.case-study-result .case-big')).map(cell => {
         const heading=cell.querySelector('strong'), description=cell.querySelector('span');
@@ -102,7 +102,7 @@ for (const [name, path, viewport] of captures) {
       throw new Error(name + ': footer sections overlap: ' + JSON.stringify(footer));
     }
   }
-  if (path === '/de/produkt.html') {
+  if (path === '/de/produkt') {
     const demo = page.locator('[data-psoydo-demo]');
     if (await demo.count() !== 1) throw new Error(name + ': synthetic comparison missing');
     const original = page.locator('#psoydo-demo-original');
@@ -123,7 +123,7 @@ for (const [name, path, viewport] of captures) {
       throw new Error(name + ': cannot restore initial example');
     }
   }
-  if (path === '/de/ki-pseudonymisierung.html') {
+  if (path === '/de/ki-pseudonymisierung') {
     await page.getByRole('link', {name: 'Praxischeck', exact: true}).click();
     const top = await page.locator('#praxischeck').evaluate(el => el.getBoundingClientRect().top);
     if (top < 75 || top > 160) throw new Error(name + ': contents target hidden by header');
@@ -160,14 +160,14 @@ for (const [name, path, viewport] of captures) {
 {
   const rhythmPages = [
     ['/de/', 'home'],
-    ['/de/produkt.html', 'product'],
-    ['/de/technologie.html', 'technology'],
-    ['/de/architektur.html', 'architecture'],
-    ['/de/anwendungsfaelle.html', 'usecases'],
-    ['/de/sicherheit.html', 'security'],
-    ['/de/preise.html', 'pricing'],
-    ['/de/impressum.html', 'imprint'],
-    ['/de/datenschutz.html', 'privacy']
+    ['/de/produkt', 'product'],
+    ['/de/technologie', 'technology'],
+    ['/de/architektur', 'architecture'],
+    ['/de/anwendungsfaelle', 'usecases'],
+    ['/de/sicherheit', 'security'],
+    ['/de/preise', 'pricing'],
+    ['/de/impressum', 'imprint'],
+    ['/de/datenschutz', 'privacy']
   ];
   const rhythmViewports = [
     ['desktop', { width: 1440, height: 900 }, 80],
@@ -307,7 +307,7 @@ for (const [name, path, viewport] of captures) {
     deviceScaleFactor: 1
   });
   const page = await context.newPage();
-  await page.goto(base + '/de/produkt.html?qa=lightbox', { waitUntil: 'networkidle' });
+  await page.goto(base + '/de/produkt?qa=lightbox', { waitUntil: 'networkidle' });
   await page.locator('#consent-decline').click();
 
   const trigger = page.locator('[data-lightbox]').first();

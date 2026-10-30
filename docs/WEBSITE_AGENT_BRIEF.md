@@ -10,7 +10,7 @@ Psoydo makes sensitive data usable with powerful AI systems by separating identi
 
 Original identities and the mapping between originals and pseudonyms are designed to remain within a customer-controlled protection boundary. External AI systems receive pseudonymized working context.
 
-Psoydo can be positioned for local, on-premises and controlled private-cloud operating models. Do not invent technical implementation details that are not documented.
+Current user-approved commercial model (2026-10-30): Psoydo is installed on customer laptops or servers and licensed annually. The 30-day pilot is a time-limited SaaS demo for evaluation only, not a permanent SaaS product. Do not invent private-cloud availability, supported platforms or technical implementation details that are not documented.
 
 ## PIF public-safe principles
 Source philosophy: DOC-PIF-001, Psoydo Intelligence Framework, 2026-06-21.

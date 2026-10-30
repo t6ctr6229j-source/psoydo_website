@@ -2,7 +2,8 @@
 
 ## Vor Veröffentlichung auf psoydo.com
 
-- Alle kanonischen URLs liefern HTTP 200.
+- Alle kanonischen, endungslosen URLs liefern direkt HTTP 200.
+- `scripts/check_pages_routes.py` besteht gegen `wrangler pages dev`; alte `.html`-Adressen leiten mit erhaltenen Abfrageparametern weiter.
 - HTTPS ohne Redirect-Schleifen.
 - https://psoydo.com/de/ ist die kanonische Startseite.
 - https://psoydo.com/sitemap.xml ist öffentlich erreichbar.
@@ -12,20 +13,21 @@
 
 ## Direkt nach Veröffentlichung
 
-1. Domain in Google Search Console verifizieren.
-2. sitemap.xml einreichen.
+1. Bestehende Domain-Property in Google Search Console öffnen; Zugriff und richtige Property prüfen.
+2. Die aktualisierte sitemap.xml in der bestehenden Property prüfen und bei Bedarf erneut einreichen.
 3. URL-Prüfung für:
    - /de/
-   - /de/produkt.html
-   - /de/technologie.html
-   - /de/architektur.html
-   - /de/anwendungsfaelle.html
-   - /de/sicherheit.html
-   - /de/preise.html
+   - /de/produkt
+   - /de/technologie
+   - /de/architektur
+   - /de/anwendungsfaelle
+   - /de/sicherheit
+   - /de/preise
 4. Live-Test der URL durchführen und Indexierung für die wichtigsten Seiten anstoßen.
 5. Prüfen, dass Impressum und Datenschutz als noindex erkannt werden.
 6. Rich Results Test / Schema Validator für Startseite und Preise ausführen.
 7. Social Preview für LinkedIn und andere relevante Plattformen prüfen.
+8. Nach Einwilligung GA4-Empfang und Property-Zuordnung im Konto prüfen. Nur `generate_lead` als primäres Lead-Schlüsselereignis konfigurieren; Details in `MEASUREMENT.md`.
 
 ## Nach 2–6 Wochen
 

@@ -34,8 +34,10 @@ cat > cf-dist/_redirects <<'EOF'
 /en /de/ 301
 /en/ /de/ 301
 /en/index.html /de/ 301
-/en/datenschutz.html /de/datenschutz.html 301
-/en/impressum.html /de/impressum.html 301
+/en/datenschutz.html /de/datenschutz 301
+/en/datenschutz /de/datenschutz 301
+/en/impressum.html /de/impressum 301
+/en/impressum /de/impressum 301
 /de /de/ 301
 /de/index.html /de/ 301
 EOF
@@ -44,4 +46,4 @@ test -s cf-dist/de/datenschutz.html
 test -s cf-dist/404.html
 test -s cf-dist/app.js
 test ! -e cf-dist/.htaccess
-echo 'Psoydo: Pages preview ready.'
+echo 'Psoydo: Pages release ready; public HTML routes use extensionless URLs.'

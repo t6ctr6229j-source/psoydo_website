@@ -7,31 +7,32 @@ Website repository for psoydo.com.
 The production website lives at the repository root. There is no separate `preview/` copy.
 
 - `/de/` — landing page
-- `/de/produkt.html` — product workflow
-- `/de/technologie.html` — PIF / technology
-- `/de/architektur.html` — deployment and trust boundaries
-- `/de/anwendungsfaelle.html` — illustrative use cases
-- `/de/sicherheit.html` — controls and security
-- `/de/preise.html` — pricing and 30-day evaluation
-- `/de/insights.html` — editorial hub and eight topic articles
-- `/de/impressum.html` / `/de/datenschutz.html` — legal pages
+- `/de/produkt` — product workflow
+- `/de/technologie` — PIF / technology
+- `/de/architektur` — deployment and trust boundaries
+- `/de/anwendungsfaelle` — illustrative use cases
+- `/de/sicherheit` — controls and security
+- `/de/preise` — pricing and 30-day evaluation
+- `/de/insights` — editorial hub, eleven topic articles and the AI data-release checklist
+- `/de/impressum` / `/de/datenschutz` — legal pages
 
 Repository: `t6ctr6229j-source/psoydo_website` (renamed from `psoydo`).
 
-GitHub Pages deploys from `redesign/register-landingpage`. As verified on 2026-09-22, that branch and `main` both point to `d5219dd` (PR #20, Insights and registration recovery).
+Cloudflare Pages deploys the production website from `main`.
 
-- GitHub Pages: https://t6ctr6229j-source.github.io/psoydo_website/de/
-- Planned canonical production URL: https://psoydo.com/de/
+- Canonical production URL: https://psoydo.com/de/
+- Public content URLs are extensionless; physical HTML filenames remain in this repository.
 
-Canonical, sitemap and social URLs intentionally use `psoydo.com`, not the repository name. Domain publication and Search Console verification remain separate release tasks; see `docs/SEO_RELEASE_CHECKLIST.md`.
+Canonical, sitemap and social URLs intentionally use `psoydo.com`, not the repository name. Use the existing Search Console property for post-release verification; see `docs/SEO_RELEASE_CHECKLIST.md`.
 
-See `docs/GO_LIVE_READINESS.md` for launch blockers and acceptance steps.
+See `docs/SEO_GEO_RELEASE_2026-10-30.md` for the current URL, product-copy and measurement changes. Older launch documents describe historical releases.
 
 For United Domains upload preparation, run `python scripts/build_release.py`. The ZIP and checksum manifest are written to `dist/`. See `docs/UNITED_DOMAINS_DEPLOYMENT.md` for the upload procedure and `.github/workflows/release-package.yml` for artifact generation; this does not deploy automatically.
 
 ## Quality controls
 
 - `scripts/qa_site.py` — dependency-free static checks
+- `scripts/check_pages_routes.py` — canonical and legacy routes against the Cloudflare Pages runtime
 - `.github/workflows/website-qa.yml` — syntax, smoke, Lighthouse and browser QA
 - `docs/WEBSITE_AGENT_BRIEF.md` — product, claims and design guardrails
 - `docs/OVERNIGHT_BUILD_STATE.md` — bounded iterative build state
