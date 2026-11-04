@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="../styles.css?v=20260929-seo-1">
   <link rel="stylesheet" href="../polish.css?v=20260922-ga4-1">
   <link rel="stylesheet" href="../v3.css?v=20260922-ga4-1">
-  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://psoydo.com/de/sicherheit#webpage","url":"https://psoydo.com/de/sicherheit","name":"Sensible Daten bei externer KI schützen | Psoydo","description":"Psoydo kombiniert Pseudonymisierung, Review, Revisions-Cockpit und GeschGehG-Prüfung, bevor sensible Inhalte an externe KI-Modelle gehen.","isPartOf":{"@id":"https://psoydo.com/#website"},"about":{"@id":"https://psoydo.com/#software"},"inLanguage":"de-DE"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Psoydo","item":"https://psoydo.com/de/"},{"@type":"ListItem","position":2,"name":"Sicherheit","item":"https://psoydo.com/de/sicherheit"}]},{"@type":"Organization","@id":"https://wescaleit.com/#organization","name":"wescaleIT AG","url":"https://wescaleit.com/","address":{"@type":"PostalAddress","streetAddress":"Magirus-Deutz-Straße 12","postalCode":"89077","addressLocality":"Ulm","addressCountry":"DE"},"telephone":"+49 731 40 32 13 75","email":"info@wescaleit.com"}]}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://psoydo.com/de/sicherheit#webpage","url":"https://psoydo.com/de/sicherheit","name":"Sensible Daten bei externer KI schützen | Psoydo","description":"Psoydo kombiniert Pseudonymisierung, Review, Revisions-Cockpit und GeschGehG-Prüfung, bevor sensible Inhalte an externe KI-Modelle gehen.","isPartOf":{"@id":"https://psoydo.com/#website"},"about":{"@id":"https://psoydo.com/#software"},"inLanguage":"de-DE","dateModified":"2026-11-04"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Psoydo","item":"https://psoydo.com/de/"},{"@type":"ListItem","position":2,"name":"Sicherheit","item":"https://psoydo.com/de/sicherheit"}]},{"@type":"Organization","@id":"https://wescaleit.com/#organization","name":"wescaleIT AG","url":"https://wescaleit.com/","address":{"@type":"PostalAddress","streetAddress":"Magirus-Deutz-Straße 12","postalCode":"89077","addressLocality":"Ulm","addressCountry":"DE"},"telephone":"+49 731 40 32 13 75","email":"info@wescaleit.com"}]}</script>
 </head>
 <body>
   <a class="skip" href="#main">Zum Inhalt</a>
@@ -98,41 +98,41 @@
       </div>
     </section>
 
-    <section class="security-evidence">
+    <section class="security-evidence" id="freigabe">
       <div class="shell wide security-evidence-head">
         <span class="v3-index">NACHVOLLZIEHBARKEIT / 05</span>
         <div>
-          <h2>Du solltest nachvollziehen können,<br><span>was vor der Freigabe passiert.</span></h2>
-          <p>Erkennung darf keine Black Box bleiben. Relevante Treffer, Auffälligkeiten und Freigaben müssen so dargestellt werden, dass ein Mensch sie vor dem nächsten Schritt beurteilen kann.</p>
+          <h2>Prüfe den konkreten Fall.<br><span>Vor seiner Freigabe.</span></h2>
+          <p>Lege die Prüfkriterien vor dem Test fest. Im Sichtabgleich vergleichst du das tatsächliche Ergebnis mit diesen Anforderungen und hältst notwendige Korrekturen fest.</p>
         </div>
       </div>
 
       <div class="shell wide evidence-grid">
         <article>
-          <small>TRANSPARENZ</small>
-          <strong>Was wurde erkannt?</strong>
-          <span>Trefferlisten, Risikokandidaten und Kontrollansichten machen sichtbar, welche schützenswerten Informationen erkannt und wie sie behandelt wurden.</span>
+          <small>ERKENNUNG</small>
+          <strong>Was blieb stehen?</strong>
+          <span>Prüfe die vorgesehenen Soll-Stellen gegen die Ausgabe. Halte übersehene sensible Angaben, offene Risikokandidaten und notwendige Korrekturen fest.</span>
+        </article>
+        <article>
+          <small>KONTEXT</small>
+          <strong>Was wurde verändert?</strong>
+          <span>Prüfe unnötige Ersetzungen, die Konsistenz der Pseudonyme und den fachlichen Zusammenhang. Die Ausgabe muss für die konkrete Analyseaufgabe brauchbar bleiben.</span>
         </article>
         <article>
           <small>VERANTWORTUNG</small>
-          <strong>Wer gibt frei?</strong>
-          <span>Der Sichtabgleich bleibt eine bewusste menschliche Kontrollinstanz. Automatisierung ersetzt die finale Verantwortung nicht.</span>
-        </article>
-        <article>
-          <small>LERNEN</small>
-          <strong>Was wird besser?</strong>
-          <span>Auffälligkeiten dienen nicht nur der Korrektur des Einzelfalls. Ursachen können in die weitere Verbesserung von Erkennung und Pipeline zurückfließen.</span>
+          <strong>Wer gibt den Fall frei?</strong>
+          <span>Eine zuständige Person bewertet die Ausgabe und dokumentiert ihre Entscheidung. Dazu gehören das vorgesehene Zielmodell, der Nutzungszweck und der Umgang mit offenen Auffälligkeiten.</span>
         </article>
       </div>
 
       <div class="shell wide security-evidence-note">
         <span class="v3-index">PRODUKTDOKUMENTATION</span>
-        <p>Logging, Rollen, Aufbewahrung und Manipulationsschutz hängen vom konkreten Produkt- und Betriebsstand ab. Was für deinen Einsatz gilt, wird vor Pilot oder Produktivbetrieb verbindlich festgelegt: statt pauschale Versprechen zu Fehlerfreiheit, Compliance oder Auditierbarkeit zu machen.</p>
+        <p>Logging, Rollen, Aufbewahrung und Manipulationsschutz hängen vom konkreten Produkt- und Betriebsstand ab. Was für deinen Einsatz gilt, wird in der <a href="architektur#einsatzplanung">Betriebsplanung</a> vor dem Start festgelegt. Die <a href="technologie#evaluation">Prüfkriterien für den Pilot</a> helfen dir, Produktstand, Testdaten und Abweichungen festzuhalten. Der Sichtabgleich bleibt eine menschliche Entscheidung und ist keine technische Vollständigkeitsgarantie.</p>
       </div>
     </section>
 
     <section class="sub-cta">
-      <div class="shell wide sub-cta-grid"><div><h2>Sicherheit wird konkret,<br>wenn echte Daten ins Spiel kommen.</h2><p>Im Pilot lässt sich genau an deinem Use Case prüfen, welche Kontrollpunkte tatsächlich relevant sind.</p></div><div class="sub-cta-actions"><a class="button" href="./#register">Pilot starten <span>↗</span></a><a class="text-link dark" href="technologie">PIF im Detail <span>↗</span></a></div></div>
+      <div class="shell wide sub-cta-grid"><div><h2>Dein Use Case.<br>Deine Freigabekriterien.</h2><p>Besprich zuerst die Aufgabe, geeignete Testdaten und die nötigen Kontrollpunkte. Sensible Originaldokumente gehören nicht in die Pilotanfrage.</p></div><div class="sub-cta-actions"><a class="button" href="preise#test">Pilotumfang ansehen <span>↗</span></a><a class="text-link dark" href="technologie#evaluation">Prüfplan ansehen <span>↗</span></a></div></div>
     </section>
   </main>
 
