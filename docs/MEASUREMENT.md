@@ -1,6 +1,6 @@
 # Website measurement
 
-Updated 2026-10-30. This describes the explicit website integration, not a verified Google account configuration or confirmed report receipt.
+Updated 2026-11-04. This describes the explicit website integration, not a verified Google account configuration or confirmed report receipt.
 
 ## Configuration
 
@@ -35,6 +35,20 @@ The configured page URL excludes query strings and fragments. External referrers
 The existing browser suite mocks Google and Tally; it does not send real measurements or submit leads. It covers initial denial, persisted and expired choices, analytics only, Ads only, both, withdrawal, re-grant, old-consent migration, preview/local/HTTP exclusion, external-referrer minimization, validated form message origins/sources/IDs and replay protection at 390/1440px. Static checks confirm the documented ID and source configuration. CI results for the exact release commit are the validation record.
 
 ## Account-side verification
+
+The 2026-11-04 status pull returned no rows for the connected Psoydo GA4 property `555398339`, including an unfiltered read spanning 2026-10-01 through 2026-11-03. This is an unresolved reception/account/reporting question, not evidence that the site had zero visitors or that the supplied measurement ID is wrong. The production source still correctly gates the documented ID on HTTPS, hostname and explicit analytics consent. The Pages CSP does not restrict Google tag or collection sources. No speculative ID replacement or consent relaxation is part of this release.
+
+Use the following acceptance record to close the gap through authenticated account access:
+
+| Check | Required evidence | Current status |
+| --- | --- | --- |
+| Property/stream mapping | The web stream under property `555398339` displays measurement ID `G-EYFT82SFN7`; any additional tag destinations are understood | Not yet verified |
+| Reception after consent | A controlled production visit appears in the intended property, with the clean page URL | Not yet verified |
+| Filters and DebugView | Data filters, internal/developer traffic handling and report lag explain what is expected in each report | Not yet verified |
+| Confirmed lead | A controlled completion is received exactly once without answer data or submission IDs; test contacts do not enter normal inquiry handling | Not yet verified |
+| Key event | Only `generate_lead` is the primary lead key event; the diagnostic event is not counted again | Not yet verified |
+
+Local mocked tests verify the browser's command queue and consent behavior. They must not be reported as Google ingestion evidence. Do not generate real measurements or submit a production inquiry merely to turn an empty report into a nonempty one.
 
 - Confirm that the actual GA4 web stream with `G-EYFT82SFN7` belongs to the intended Psoydo property and review any additional configured tag destinations. The ID alone does not establish property ownership.
 - Review enhanced measurement, especially automatic form interactions and pageviews, to avoid unintended collection or duplicate counts alongside the explicit integration.
