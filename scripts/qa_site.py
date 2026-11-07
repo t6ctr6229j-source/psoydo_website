@@ -132,11 +132,11 @@ def check_page(page: Path, errors: list[str]):
         fail(errors, f"{rel}: html lang must be de")
     if not parser.title or len(parser.title) < 15:
         fail(errors, f"{rel}: missing/weak title")
-    if len(parser.title) > 70:
+    if len(parser.title) > 60:
         fail(errors, f"{rel}: title too long ({len(parser.title)} chars)")
     if not parser.description or len(parser.description.strip()) < 80:
         fail(errors, f"{rel}: missing/weak meta description")
-    if parser.description and len(parser.description.strip()) > 170:
+    if parser.description and len(parser.description.strip()) > 160:
         fail(errors, f"{rel}: meta description too long ({len(parser.description.strip())} chars)")
     if parser.h1_count != 1:
         fail(errors, f"{rel}: expected exactly one h1, got {parser.h1_count}")
