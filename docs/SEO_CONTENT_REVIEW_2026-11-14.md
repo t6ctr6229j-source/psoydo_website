@@ -7,7 +7,7 @@ JavaScript, images, branding, pricing or security configuration changes.
 
 - Product: make pilot acceptance questions and limits explicit; link to the data-flow explanation.
 - Architecture: express the existing diagram as one readable text sequence; explain that the payload still needs review and that model names are possible targets, not promised integrations.
-- AI pseudonymization article: link directly to the relevant product limits and data-flow sections; describe customer-server installation and annual licensing without asserting a SaaS evaluation offering. Align visible and structured modification dates.
+- AI pseudonymization article: link directly to the relevant product limits and data-flow sections; describe customer-server installation and annual licensing with the explicitly confirmed SaaS-demo exception. Align visible and structured modification dates.
 
 ## Evidence / claim boundaries
 
@@ -15,7 +15,7 @@ The sources are the repository's existing public product material, not an indepe
 
 | Statement | Existing evidence |
 |---|---|
-| Customer servers and annual license; evaluation scope to be agreed | Explicit user decision of 2026-10-27; no SaaS-pilot exception independently confirmed |
+| Customer servers and annual license for production; SaaS for the demo | User decision of 2026-10-27 and explicit demo clarification on 2026-11-14 |
 | Human review and conscious release; no perfection guarantee | Agent brief PIF principles and claims discipline; `de/sicherheit.html#freigabe` |
 | Original, mapping, pseudonymized payload and controlled return | Existing architecture diagram/data-state sections and product closed loop |
 | Test detection, missed/unnecessary replacements, context and effort | Existing `de/technologie.html#evaluation` and security evidence grid |
@@ -39,23 +39,22 @@ Neither these content changes nor lab test scores establish Seobility 100/100,
 search rankings, AI citations or qualified leads. Those require observation after
 an approved release.
 
-## Commercial-copy conflict identified before publication
+## Commercial-model clarification before publication
 
-The user explicitly specified annual licensing, installation on customer servers,
-and no SaaS offering on 2026-10-27:
-https://chatgpt.com/c/6ae05dbb-3ec0-83ed-b5b6-d833365118f4?messageId=d8be70a3-c012-4077-be2c-502e889a4399
+The user specified annual licensing and installation on customer servers on
+2026-10-27. A possible SaaS-demo exception was initially not explicitly confirmed,
+so the new article sentence was conservatively removed in commit ffd399fd.
 
-The existing product/architecture pages and agent brief describe a limited SaaS
-pilot. That wording predates this content change and was present in merged PR
-#39 on 2026-10-30. Repository wording, including the brief's phrase
-"user-approved", is not evidence of a separately verified owner decision.
-No explicit later SaaS-pilot exception was confirmed in the reviewed messages.
-The general 2026-10-29 release instruction does not settle that product-model
-ambiguity.
+On 2026-11-14 the user explicitly clarified that SaaS is intended for the demo.
+The article now distinguishes the time-limited SaaS demo from production on
+customer servers with annual licensing. The former conflict about the demo
+operating model is resolved by that clarification, not by repository wording.
 
-The newly added SaaS-evaluation sentence in the AI pseudonymization article was
-therefore removed before publication and replaced by customer-server annual
-licensing plus evaluation scope to be agreed. Existing SaaS passages elsewhere
-remain an unresolved commercial-copy conflict, not a confirmed offering.
-Resolve that conflict with the owner before publishing any broader pilot claims.
-This correction makes no live changes and does not alter those older passages.
+This confirmation concerns the demo operating model only. It does not establish
+new technical capabilities, hosting locations, permitted data categories,
+security guarantees, availability, prices, user limits or contract conditions.
+Older commercial details elsewhere are unchanged, not freshly re-approved.
+Technical prerequisites and evaluation scope remain subject to agreement.
+
+No production publication is included. Fresh full CI must pass for this commit;
+the earlier local test results above apply to the preceding content revisions.
