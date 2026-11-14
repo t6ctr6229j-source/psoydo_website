@@ -125,6 +125,12 @@ export async function checkMeasurement(browser){
   assert.equal(google,beforeOld);
   // No production statistics on the preview hostname, even after explicit selection.
   for(const origin of ['https://preview.test','https://branch.psoydo-website.pages.dev','http://localhost','http://psoydo.com']){
+   // Model an HTTP-only endpoint for this case. Otherwise Chromium upgrades
+   // the mocked production host to HTTPS and tests the allowed origin instead.
+   // All traffic remains intercepted; production transport/settings are unchanged.
+   if(origin==='http://psoydo.com'){
+    await context.route('https://psoydo.com/**',route=>route.abort('connectionrefused'));
+   }
    await page.goto(origin+'/de/insights');
    assert.equal(new URL(page.url()).origin,origin,
     'Measurement fixture must retain the requested origin (browser HTTPS upgrades change the case under test)');
