@@ -22,7 +22,7 @@ const assert = require('node:assert/strict');
         for (const heading of await page.locator('main h2').all()) {
           assert(await heading.isVisible(), `${file}: section heading hidden without JavaScript: ${await heading.textContent()}`);
         }
-        assert(await page.locator('footer a[href="produkt"]').isVisible(), `${file}: navigation absent`);
+        assert(await page.locator('footer a[href="insights"]').isVisible(), `${file}: navigation absent`);
         assert(await page.locator('footer a[href^="mailto:"]').isVisible(), `${file}: contact unavailable`);
         if (file === 'index.html') {
           assert(await page.getByRole('link', {name:'Zur KI-Datenfreigabe-Checkliste'}).isVisible());
