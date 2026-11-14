@@ -121,7 +121,8 @@ jobs:
           PY
 
       - name: Browser screenshots
-        if: github.event_name == 'pull_request'
+        # Keep independent functional diagnostics even when a Lighthouse floor fails.
+        if: github.event_name == 'pull_request' && !cancelled()
         run: |
           CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$CHROME"
