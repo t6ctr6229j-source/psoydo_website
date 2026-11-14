@@ -9,7 +9,7 @@ const configs = [
  {repo:'wescaleIT_website',file:'js/analytics.js',host:'wescaleit.com',id:'G-7QYEF752NM',key:'wescaleit.statistics.v1',accept:'[data-statistics-accept]',deny:'[data-statistics-deny]',value:(yes,exp)=>({choice:yes?'granted':'denied',expires:exp})},
  {repo:'silverback_network',file:'dist/analytics.js',host:'www.silverback-network.com',id:'G-RWGM8X6QGH',key:'silverback.analytics-consent.v1',accept:'[data-analytics-accept]',deny:'[data-analytics-deny]',value:(yes,exp)=>({choice:yes?'accepted':'denied',expires:exp})}
 ];
-function make(c, {saved,blocked=false}={}) {
+function make(c, {saved,blocked=false,protocol='https:'}={}) {
  let clock=1800000000000, reloads=0, serial=0;
  const storage=new Map(saved?[ [c.key,JSON.stringify(saved(clock))] ]:[]);
  const timers=new Map(), all=[], events=new Map(), cookieDeletes=[], scripts=[];
@@ -29,7 +29,7 @@ function make(c, {saved,blocked=false}={}) {
   querySelectorAll:s=>s==='.footer-legal button'?[footer]:s==='[data-statistics-settings]'?[el(s)]:[],
   addEventListener(){},removeEventListener(){},referrer:'https://example.org/start?secret=yes'};
  Object.defineProperty(document,'cookie',{get:()=>`_ga=example; _ga_${c.id.slice(2)}=example; _gcl_au=example; essential=keep`,set:v=>cookieDeletes.push(v)});
- const location={hostname:c.host,protocol:'https:',pathname:'/test.html',origin:'https://'+c.host,href:'https://'+c.host+'/test.html?secret=yes#fragment',reload(){reloads++;}};
+ const location={hostname:c.host,protocol,pathname:'/test.html',origin:protocol+'//'+c.host,href:protocol+'//'+c.host+'/test.html?secret=yes#fragment',reload(){reloads++;}};
  const window={location,addEventListener(k,f){if(!events.has(k))events.set(k,[]);events.get(k).push(f);},dispatchEvent(){},setTimeout:(f,d)=>{timers.set(++serial,{f,d});return serial;}};
  const context={window,document,location,localStorage:{getItem:k=>{if(blocked)throw Error('blocked');return storage.get(k)||null;},setItem:(k,v)=>{if(blocked)throw Error('blocked');storage.set(k,v);}},
   setTimeout:window.setTimeout,clearTimeout:id=>timers.delete(id),URL,Date:class extends Date {constructor(...a){super(...(a.length?a:[clock]));} static now(){return clock;}},CustomEvent:class {constructor(type,options){Object.assign(this,{type,...options});}}};
@@ -60,6 +60,18 @@ for(const c of configs.filter(c=>c.repo==='psoydo_website')){
  check(c.repo+' back-forward cache revalidates',()=>{const x=make(c);x.event('pageshow',{persisted:true});assert.equal(x.reloads,1);});
 }
 const p=configs[1];
+// Exercise the real consent code with exact HTTP locations. Browser automation
+// automatically upgrades the production hostname to HTTPS and cannot preserve this case.
+for(const host of ['psoydo.com','www.psoydo.com']){
+ for(const stored of [false,true]){
+  check(`HTTP ${host}, ${stored?'saved':'new'} full consent never loads measurement`,()=>{
+   const c={...p,host};
+   const x=make(c,{protocol:'http:',saved:stored?n=>({...c.value(true,n+10000),ads:true}):undefined});
+   x.el('#consent-analytics').checked=true;x.el('#consent-ads').checked=true;x.click(c.accept);
+   assert.equal(x.scripts.length,0);assert.equal(x.configs().length,0);
+  });
+ }
+}
 check('Psoydo Ads-only never configures Analytics',()=>{const x=make(p);x.el('#consent-ads').checked=true;x.click(p.accept);assert.equal(x.scripts.length,1);assert.ok(x.scripts[0].src.includes('AW-'));assert.equal(x.configs().some(a=>a[1]===p.id),false);assert.equal(x.window['ga-disable-'+p.id],true);x.revoke();assert.equal(x.reloads,1);});
 check('Psoydo Analytics-only never configures Ads',()=>{const x=make(p);x.grant();assert.equal(x.configs().some(a=>a[1].startsWith('AW-')),false);});
 check('Psoydo old unlimited consent is invalidated',()=>{const x=make(p,{saved:()=>({analytics:true,ads:true})});assert.equal(x.scripts.length,0);});

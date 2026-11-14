@@ -53,6 +53,8 @@ jobs:
           python scripts/check_routes.py
       - name: JavaScript syntax
         run: node --check app.js
+      - name: Consent lifecycle and exact HTTP origin guard
+        run: node scripts/check-consent-lifecycle.cjs
       - name: Start local site
         run: |
           sh scripts/build-cloudflare-pages.sh

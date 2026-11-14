@@ -123,14 +123,10 @@ export async function checkMeasurement(browser){
   const beforeOld=google;
   await page.reload();await page.locator('#consent.show').waitFor();
   assert.equal(google,beforeOld);
-  // No production statistics on the preview hostname, even after explicit selection.
-  for(const origin of ['https://preview.test','https://branch.psoydo-website.pages.dev','http://localhost','http://psoydo.com']){
-   // Model an HTTP-only endpoint for this case. Otherwise Chromium upgrades
-   // the mocked production host to HTTPS and tests the allowed origin instead.
-   // All traffic remains intercepted; production transport/settings are unchanged.
-   if(origin==='http://psoydo.com'){
-    await context.route('https://psoydo.com/**',route=>route.abort('connectionrefused'));
-   }
+  // No production statistics on preview/local hosts, even after explicit selection.
+  // HTTP on the production hostname is covered by check-consent-lifecycle.cjs:
+  // Chromium upgrades that fixture to HTTPS before the application can inspect it.
+  for(const origin of ['https://preview.test','https://branch.psoydo-website.pages.dev','http://localhost']){
    await page.goto(origin+'/de/insights');
    assert.equal(new URL(page.url()).origin,origin,
     'Measurement fixture must retain the requested origin (browser HTTPS upgrades change the case under test)');
