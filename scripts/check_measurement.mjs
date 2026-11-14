@@ -126,6 +126,8 @@ export async function checkMeasurement(browser){
   // No production statistics on the preview hostname, even after explicit selection.
   for(const origin of ['https://preview.test','https://branch.psoydo-website.pages.dev','http://localhost','http://psoydo.com']){
    await page.goto(origin+'/de/insights');
+   assert.equal(new URL(page.url()).origin,origin,
+    'Measurement fixture must retain the requested origin (browser HTTPS upgrades change the case under test)');
    await page.locator('#consent.show').waitFor();
    await page.locator('#consent-analytics').check();await page.locator('#consent-accept').click();
    assert.equal(google,beforeOld,'Non-production origins must not start measurement: '+origin);
