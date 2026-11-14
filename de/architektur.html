@@ -64,7 +64,7 @@
       </div>
     </section>
 
-    <section class="architecture-map-section">
+    <section class="architecture-map-section" id="datenfluss">
       <div class="shell wide architecture-map-head">
         <span class="v3-index">TRUST BOUNDARY / 02</span>
         <div>
@@ -110,7 +110,7 @@
 
       <div class="shell wide arch-map-note">
         <span class="v3-index">ARCHITEKTURPRINZIP</span>
-        <p>Die Schutzentscheidung wird <strong>vor</strong> dem Zielmodell getroffen. Dadurch kann die Modellwahl von der Identitätsfrage entkoppelt werden.</p>
+        <p>Der Ablauf: Originaldokumente → Pseudonymisierung → menschliche Prüfung und Freigabe → Arbeitsfassung für das Zielmodell → Antwort mit Pseudonymen → kontrollierte Rückführung. Die Schutzentscheidung wird <strong>vor</strong> dem Zielmodell getroffen. Originale und Zuordnungen gehören nicht in den zur Analyse freigegebenen Arbeitskontext.</p>
       </div>
     </section>
 
@@ -136,7 +136,7 @@
         <article class="arch-state">
           <small>03 / PAYLOAD</small>
           <strong>Pseudonymisierter Kontext</strong>
-          <p>Die Information, die das externe Modell für die konkrete Analyseaufgabe erhalten soll.</p>
+          <p>Die geprüfte Arbeitsfassung für die konkrete Analyseaufgabe. Sie kann weiterhin vertrauliche Inhalte und indirekte Hinweise enthalten. Deshalb bleibt die <a href="sicherheit#freigabe">Prüfung vor der Freigabe</a> erforderlich.</p>
           <em>ARBEITSEBENE DES ZIELMODELLS</em>
         </article>
       </div>
@@ -181,7 +181,7 @@
         <span class="v3-index">MODELLFREIHEIT / 05</span>
         <div>
           <h2>Die KI darf wechseln.<br><span>Die Schutzgrenze nicht.</span></h2>
-          <p>Die Schutzlogik soll nicht davon abhängen, welcher Modellanbieter gerade die beste Lösung für eine Aufgabe liefert. So kann das Zielmodell nach fachlicher Eignung gewählt werden, ohne den Schutzprozess neu zu erfinden.</p>
+          <p>Die Schutzlogik soll nicht davon abhängen, welcher Modellanbieter gerade die beste Lösung für eine Aufgabe liefert. Die hier genannten Modellfamilien sind mögliche Ziele, keine Zusage einer fertig eingerichteten Integration. Prüfe vor der Nutzung, welche Daten du übergibst und welche Verarbeitung, Speicherung und Zugriffsbedingungen beim gewählten Anbieter gelten.</p>
         </div>
       </div>
       <div class="shell wide model-chips">
