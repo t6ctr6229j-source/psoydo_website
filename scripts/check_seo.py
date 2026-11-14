@@ -7,8 +7,15 @@ import re
 import subprocess
 from datetime import date
 from urllib.parse import urlsplit
+from urllib.robotparser import RobotFileParser
 ROOT=Path(__file__).resolve().parents[1]
 def plain(s): return ' '.join(html.unescape(re.sub('<[^>]+>',' ',s)).split())
+# House limits are editorial safeguards, not guarantees of Google snippet display.
+robots = RobotFileParser()
+robots.parse((ROOT / 'robots.txt').read_text().splitlines())
+assert not robots.can_fetch('Googlebot', 'https://psoydo.com/cdn-cgi/l/email-protection')
+for path in ['/de/', '/de/produkt', '/app.js', '/cdn-cgi/scripts/email-decode.min.js']:
+    assert robots.can_fetch('Googlebot', 'https://psoydo.com' + path), ('unexpected robots block', path)
 entities={}
 for page in sorted((ROOT/'de').glob('*.html')):
     text=page.read_text()
@@ -21,11 +28,17 @@ for page in sorted((ROOT/'de').glob('*.html')):
         if not link.netloc and not link.scheme:
             assert not link.path.endswith('.html'), (page.name,'redirecting internal link',href)
     assert 'hreflang="en"' not in text and 'href="/en/' not in text, page.name
+    description = html.unescape(re.search(r'<meta name="description" content="([^"]+)"', text)[1])
+    for attribute in ['property="og:description"', 'name="twitter:description"']:
+        social = html.unescape(re.search(r'<meta ' + attribute + r' content="([^"]+)"', text)[1])
+        assert social == description, (page.name, 'social description drift')
     graph=json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>',text,re.S)[1])['@graph']
     ids=[n['@id'] for n in graph if '@id' in n]
     assert len(ids)==len(set(ids)), (page.name,'duplicate entity')
     for node in graph:
         if node.get('@type') in ['WebPage','Article','CollectionPage']:
+            if node.get('description'):
+                assert node['description'] == description, (page.name, 'schema description drift')
             page_url=node.get('url') or node.get('mainEntityOfPage')
             assert page_url==canonical, (page.name,'schema page URL',page_url)
         if 'dateModified' in node:
