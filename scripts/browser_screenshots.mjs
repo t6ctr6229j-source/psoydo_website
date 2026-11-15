@@ -65,7 +65,7 @@ for (const [name, path, viewport] of captures) {
   if (path === '/de/anwendungsfaelle') {
     const titles = await page.evaluate(() =>
       Array.from(document.querySelectorAll('.case-study-result .case-big')).map(cell => {
-        const heading=cell.querySelector('strong'), description=cell.querySelector('span');
+        const heading=cell.querySelector('strong, [data-visual-tag="strong"]'), description=cell.querySelector('span:not([data-visual-tag])');
         const textRange=document.createRange();
         textRange.selectNodeContents(heading);
         const container=cell.getBoundingClientRect();

@@ -26,9 +26,9 @@
   <link rel="canonical" href="https://psoydo.com/de/architektur">
   <link rel="icon" href="../favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="../favicon.svg">
-  <link rel="stylesheet" href="../styles.css?v=20260929-seo-1">
-  <link rel="stylesheet" href="../polish.css?v=20260922-ga4-1">
-  <link rel="stylesheet" href="../v3.css?v=20260922-ga4-1">
+  <link rel="stylesheet" href="../styles.css?v=20260929-seo-1-labels-20261115">
+  <link rel="stylesheet" href="../polish.css?v=20260922-ga4-1-labels-20261115">
+  <link rel="stylesheet" href="../v3.css?v=20260922-ga4-1-labels-20261115">
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://psoydo.com/de/architektur#webpage","url":"https://psoydo.com/de/architektur","name":"Sichere KI-Architektur für sensible Daten | Psoydo","description":"Psoydo trennt Originaldaten, Mapping und Review vom pseudonymisierten Arbeitskontext und schafft eine kontrollierte Grenze zu externen KI-Modellen.","isPartOf":{"@id":"https://psoydo.com/#website"},"about":{"@id":"https://psoydo.com/#software"},"inLanguage":"de-DE","dateModified":"2026-11-04"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Psoydo","item":"https://psoydo.com/de/"},{"@type":"ListItem","position":2,"name":"Architektur","item":"https://psoydo.com/de/architektur"}]},{"@type":"Organization","@id":"https://wescaleit.com/#organization","name":"wescaleIT AG","url":"https://wescaleit.com/","address":{"@type":"PostalAddress","streetAddress":"Magirus-Deutz-Straße 12","postalCode":"89077","addressLocality":"Ulm","addressCountry":"DE"},"telephone":"+49 731 40 32 13 75","email":"info@wescaleit.com"}]}</script>
 </head>
 <body>
@@ -75,32 +75,32 @@
 
       <div class="shell wide architecture-map">
         <div class="arch-zone">
-          <div class="arch-zone-head"><span>UNTERNEHMENSSEITE</span><b>CONTROLLED ZONE</b></div>
+          <div class="arch-zone-head"><span>UNTERNEHMENSSEITE</span><span data-visual-tag="b" data-visual-index="0">CONTROLLED ZONE</span></div>
           <h3>Original + Zuordnung</h3>
           <p>Hier liegen die Informationen, die reale Personen, Unternehmen, Orte oder andere schützenswerte Bezüge identifizierbar machen.</p>
 
           <div class="arch-nodes">
-            <div class="arch-node"><i>01</i><div><strong>Originaldaten</strong><span>Dokumente, Tabellen, Mails, Logs</span></div><b>REAL</b></div>
-            <div class="arch-node"><i>02</i><div><strong>Mapping</strong><span>Original ↔ Pseudonym</span></div><b>CONTROLLED</b></div>
-            <div class="arch-node"><i>03</i><div><strong>Review</strong><span>Revision, Sichtabgleich, Freigabe</span></div><b>HUMAN</b></div>
+            <div class="arch-node"><i>01</i><div><span data-visual-tag="strong" data-visual-index="1">Originaldaten</span><span>Dokumente, Tabellen, Mails, Logs</span></div><span data-visual-tag="b" data-visual-index="2">REAL</span></div>
+            <div class="arch-node"><i>02</i><div><span data-visual-tag="strong" data-visual-index="3">Mapping</span><span>Original ↔ Pseudonym</span></div><span data-visual-tag="b" data-visual-index="4">CONTROLLED</span></div>
+            <div class="arch-node"><i>03</i><div><span data-visual-tag="strong" data-visual-index="5">Review</span><span>Revision, Sichtabgleich, Freigabe</span></div><span data-visual-tag="b" data-visual-index="6">HUMAN</span></div>
           </div>
         </div>
 
         <div class="arch-boundary">
           <span class="arch-boundary-mark">P</span>
-          <strong>PSOYDO CONTROL BOUNDARY</strong>
+          <span data-visual-tag="strong" data-visual-index="7">PSOYDO CONTROL BOUNDARY</span>
           <small>IDENTITÄT<br>→ KONTEXT</small>
         </div>
 
         <div class="arch-zone external">
-          <div class="arch-zone-head"><span>MODELLSEITE</span><b>ABSTRACTED ZONE</b></div>
+          <div class="arch-zone-head"><span>MODELLSEITE</span><span data-visual-tag="b" data-visual-index="8">ABSTRACTED ZONE</span></div>
           <h3>Kontext + Pseudonyme</h3>
           <p>Das Zielmodell erhält nur den Arbeitskontext, der für die Analyse vorgesehen ist; mit konsistenten Pseudonymen statt der ursprünglichen Identitäten.</p>
 
           <div class="arch-nodes">
-            <div class="arch-node"><i>A</i><div><strong>Pseudonymisierter Payload</strong><span>PERSON_041 · UNTERNEHMEN_018 · ORT_003</span></div><b>ABSTRACTED</b></div>
-            <div class="arch-node"><i>B</i><div><strong>Zielmodell</strong><span>GPT, Claude, Gemini oder anderes Modell</span></div><b>SELECTABLE</b></div>
-            <div class="arch-node"><i>C</i><div><strong>Analyseergebnis</strong><span>Antwort weiterhin mit Pseudonymen</span></div><b>RETURN</b></div>
+            <div class="arch-node"><i>A</i><div><span data-visual-tag="strong" data-visual-index="9">Pseudonymisierter Payload</span><span>PERSON_041 · UNTERNEHMEN_018 · ORT_003</span></div><span data-visual-tag="b" data-visual-index="10">ABSTRACTED</span></div>
+            <div class="arch-node"><i>B</i><div><span data-visual-tag="strong" data-visual-index="11">Zielmodell</span><span>GPT, Claude, Gemini oder anderes Modell</span></div><span data-visual-tag="b" data-visual-index="12">SELECTABLE</span></div>
+            <div class="arch-node"><i>C</i><div><span data-visual-tag="strong" data-visual-index="13">Analyseergebnis</span><span>Antwort weiterhin mit Pseudonymen</span></div><span data-visual-tag="b" data-visual-index="14">RETURN</span></div>
           </div>
         </div>
 
@@ -123,19 +123,19 @@
       <div class="shell wide arch-state-track">
         <article class="arch-state">
           <small>01 / ORIGINAL</small>
-          <strong>Reale Identität</strong>
+          <span data-visual-tag="strong" data-visual-index="16">Reale Identität</span>
           <p>Namen, Unternehmen, Orte, Kennungen und weitere Bezüge in ihrer ursprünglichen Form.</p>
           <em>QUELLE DES PERSONEN- ODER UNTERNEHMENSBEZUGS</em>
         </article>
         <article class="arch-state">
           <small>02 / MAPPING</small>
-          <strong>Kontrollierte Zuordnung</strong>
+          <span data-visual-tag="strong" data-visual-index="17">Kontrollierte Zuordnung</span>
           <p>Die Beziehung zwischen Original und Pseudonym. Sie ermöglicht die spätere kontrollierte Rückführung.</p>
           <em>BRÜCKE ZWISCHEN ORIGINAL UND ABSTRAKTION</em>
         </article>
         <article class="arch-state">
           <small>03 / PAYLOAD</small>
-          <strong>Pseudonymisierter Kontext</strong>
+          <span data-visual-tag="strong" data-visual-index="18">Pseudonymisierter Kontext</span>
           <p>Die geprüfte Arbeitsfassung für die konkrete Analyseaufgabe. Sie kann weiterhin vertrauliche Inhalte und indirekte Hinweise enthalten. Deshalb bleibt die <a href="sicherheit#freigabe">Prüfung vor der Freigabe</a> erforderlich.</p>
           <em>ARBEITSEBENE DES ZIELMODELLS</em>
         </article>
@@ -157,19 +157,19 @@
           <small>PRODUKTIVBETRIEB / A</small>
           <h3>Laptop</h3>
           <p>Installation auf deinem eigenen Laptop. Betriebssystem, verfügbare Ressourcen, Dokumentumfang und Einrichtung stimmen wir vor dem Start für deinen Einsatz ab.</p>
-          <b>KUNDENEIGENES GERÄT · JAHRESLIZENZ</b>
+          <span data-visual-tag="b" data-visual-index="19">KUNDENEIGENES GERÄT · JAHRESLIZENZ</span>
         </article>
         <article class="deployment-option">
           <small>PRODUKTIVBETRIEB / B</small>
           <h3>Server</h3>
           <p>Installation auf deinen eigenen Servern. Einbindung, Zugriffswege und Betriebsverantwortung klären wir für deine Umgebung. Der konkrete Leistungsumfang steht im Angebot.</p>
-          <b>KUNDENEIGENE INFRASTRUKTUR · JAHRESLIZENZ</b>
+          <span data-visual-tag="b" data-visual-index="20">KUNDENEIGENE INFRASTRUKTUR · JAHRESLIZENZ</span>
         </article>
         <article class="deployment-option">
           <small>EVALUATION / C</small>
           <h3>30-Tage-Pilot</h3>
           <p>Ein Nutzer prüft einen Use Case in unserer SaaS-Demoumgebung. Der Pilot endet nach 30 Tagen ohne automatische Verlängerung.</p>
-          <b>ZEITLICH BEGRENZTE SAAS-DEMO · 990 € NETTO</b>
+          <span data-visual-tag="b" data-visual-index="21">ZEITLICH BEGRENZTE SAAS-DEMO · 990 € NETTO</span>
         </article>
       </div>
 
@@ -185,9 +185,9 @@
         </div>
       </div>
       <div class="shell wide model-chips">
-        <div class="model-chip"><small>MODELLKLASSE / 01</small><strong>GPT</strong><span>mögliches Zielmodell</span></div>
-        <div class="model-chip"><small>MODELLKLASSE / 02</small><strong>Claude</strong><span>mögliches Zielmodell</span></div>
-        <div class="model-chip"><small>MODELLKLASSE / 03</small><strong>Gemini</strong><span>mögliches Zielmodell</span></div>
+        <div class="model-chip"><small>MODELLKLASSE / 01</small><span data-visual-tag="strong" data-visual-index="22">GPT</span><span>mögliches Zielmodell</span></div>
+        <div class="model-chip"><small>MODELLKLASSE / 02</small><span data-visual-tag="strong" data-visual-index="23">Claude</span><span>mögliches Zielmodell</span></div>
+        <div class="model-chip"><small>MODELLKLASSE / 03</small><span data-visual-tag="strong" data-visual-index="24">Gemini</span><span>mögliches Zielmodell</span></div>
       </div>
     </section>
 
@@ -203,7 +203,7 @@
   <footer class="site-footer dark-section">
     <div class="shell wide footer-top"><a class="logo footer-logo" href="./"><img class="brand-wordmark" src="../assets/web/psoydo-negative.webp" alt="Psoydo" width="700" height="180"></a><p>Die Schutzschicht zwischen sensiblen Unternehmensdaten und leistungsfähiger KI.</p></div>
     <div class="shell wide footer-bottom"><span class="footer-provider"><img loading="lazy" decoding="async" src="../assets/web/wescaleit-negative.webp" alt="wescaleIT" width="700" height="313"><span>Anbieter &amp; Vertrieb</span></span><div><a href="produkt">Produkt</a><a href="technologie">Technologie</a><a href="anwendungsfaelle">Use Cases</a><a href="sicherheit">Sicherheit</a><a href="preise">Preise</a><a href="insights">Insights</a><a href="impressum">Impressum</a><a href="datenschutz">Datenschutz</a></div></div>
-    <div class="shell wide footer-contact"><address><strong>wescaleIT AG</strong><br>Geschäftsanschrift: Magirus-Deutz-Straße 12 · 89077 Ulm</address><div><a href="tel:+4973140321375">+49 731 40 32 13 75</a><a href="mailto:info@wescaleit.com">info@wescaleit.com</a></div></div>
+    <div class="shell wide footer-contact"><address><span data-visual-tag="strong" data-visual-index="25">wescaleIT AG</span><br>Geschäftsanschrift: Magirus-Deutz-Straße 12 · 89077 Ulm</address><div><a href="tel:+4973140321375">+49 731 40 32 13 75</a><a href="mailto:info@wescaleit.com">info@wescaleit.com</a></div></div>
     <div class="shell wide"><button id="consent-reopen">Cookie-Einstellungen</button></div>
   </footer>
   <div id="consent" class="consent" role="dialog" aria-label="Cookie-Einstellungen" aria-hidden="true"><div>
