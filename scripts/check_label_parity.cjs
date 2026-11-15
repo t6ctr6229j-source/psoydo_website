@@ -46,7 +46,7 @@ const capture = () => [...document.querySelectorAll('body *')].map(el=>{
     const page=await context.newPage();
     await page.goto(BASE+'/de/'+(name==='index'?'':name),{waitUntil:'networkidle'});
     // Force off-screen sections to render before BOTH captures. This is the site's existing full-page QA mode.
-    await page.evaluate(async()=>{document.documentElement.classList.add('qa-fullpage');await document.fonts.ready;document.body.getBoundingClientRect();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));});
+    await page.evaluate(async()=>{document.documentElement.classList.add('qa-fullpage');await document.fonts.ready;document.body.getBoundingClientRect();});
     results.push(await page.evaluate(capture));await context.close();
    }
    const [old,now]=results;assert.equal(now.length,old.length,name+' element count');
