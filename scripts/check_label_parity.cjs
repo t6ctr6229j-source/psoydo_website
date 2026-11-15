@@ -1,12 +1,28 @@
 // Labels are presentational, but their typography and layout must not change.
 const { chromium } = require('playwright');
-const { execFileSync } = require('node:child_process');
+const { readFileSync } = require('node:fs');
+const { join } = require('node:path');
 const assert = require('node:assert/strict');
 const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
-const REV = '73c580a018fa78a7f60550ea47fb746bb630e320';
+const ROOT = join(__dirname, '..');
 const pages = ['index','produkt','anwendungsfaelle','sicherheit','preise','architektur','technologie'];
 const css = ['styles.css','polish.css','v3.css','pricing.css','insights.css'];
-const previous = new Map([...pages.map(n=>'de/'+n+'.html'),...css].map(p=>[p,execFileSync('git',['show',REV+':'+p],{encoding:'utf8'})]));
+// Reconstruct the original semantic tags for the CURRENT content, so future copy edits stay valid.
+function originalMarkup(text) {
+ return text.replace(/<span data-visual-tag="(strong|b)" data-visual-index="\d+"([^>]*)>([\s\S]*?)<\/span>/g,(all,tag,attrs,body)=>{
+  assert.ok(!body.includes('<span'), 'Nested label requires parser-aware fixture');
+  return '<'+tag+attrs+'>'+body+'</'+tag+'>';
+ });
+}
+function originalCSS(text) {
+ return text.replace('/* Presentational labels retain typography without announcing semantic importance. */\n:where([data-visual-tag]){font-weight:bolder}\n','')
+  .replaceAll('span:not(:where([data-visual-tag]))','span')
+  .replaceAll(':is(strong, :where([data-visual-tag="strong"]))','strong')
+  .replaceAll(':is(b, :where([data-visual-tag="b"]))','b');
+}
+const previous = new Map([...pages.map(n=>'de/'+n+'.html'),...css].map(p=>{
+ const text=readFileSync(join(ROOT,p),'utf8');return [p,p.endsWith('.css')?originalCSS(text):originalMarkup(text)];
+}));
 const capture = () => [...document.querySelectorAll('body *')].map(el=>{
  const s=getComputedStyle(el),r=el.getBoundingClientRect();
  const props=['display','fontFamily','fontSize','fontWeight','fontStyle','lineHeight','letterSpacing','color','backgroundColor','paddingTop','paddingRight','paddingBottom','paddingLeft','marginTop','marginRight','marginBottom','marginLeft','position','textTransform','textAlign','opacity','transform','gridTemplateColumns','gap'];
