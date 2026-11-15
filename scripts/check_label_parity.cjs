@@ -7,6 +7,7 @@ const BASE = process.env.BASE_URL || 'http://127.0.0.1:8080';
 const ROOT = join(__dirname, '..');
 const pages = ['index','produkt','anwendungsfaelle','sicherheit','preise','architektur','technologie'];
 const css = ['styles.css','polish.css','v3.css','pricing.css','insights.css'];
+// Baseline follows current content, including separately reviewed article additions.
 // Reconstruct the original semantic tags for the CURRENT content, so future copy edits stay valid.
 function originalMarkup(text) {
  return text.replace(/<span data-visual-tag="(strong|b)" data-visual-index="\d+"([^>]*)>([\s\S]*?)<\/span>/g,(all,tag,attrs,body)=>{
