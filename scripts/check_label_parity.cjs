@@ -47,7 +47,13 @@ const capture = () => [...document.querySelectorAll('body *')].map(el=>{
     await page.goto(BASE+'/de/'+(name==='index'?'':name),{waitUntil:'networkidle'});
     // Force off-screen sections to render before BOTH captures. This is the site's existing full-page QA mode.
     await page.evaluate(async()=>{document.documentElement.classList.add('qa-fullpage');await document.fonts.ready;document.body.getBoundingClientRect();});
-    results.push(await page.evaluate(capture));await context.close();
+    // Prime every off-screen descendant before reading computed styles; Chromium can defer descendant style resolution.
+    await page.evaluate(()=>{for(const el of document.querySelectorAll('body *'))el.getBoundingClientRect();});
+    await page.waitForTimeout(100);
+    const first=await page.evaluate(capture);
+    const second=await page.evaluate(capture);
+    assert.deepEqual(second,first,name+' '+width+' capture must be stable');
+    results.push(second);await context.close();
    }
    const [old,now]=results;assert.equal(now.length,old.length,name+' element count');
    let labels=0; const differences=[];
