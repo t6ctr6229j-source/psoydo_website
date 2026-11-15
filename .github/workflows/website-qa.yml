@@ -129,6 +129,8 @@ jobs:
           CHROME="$(command -v google-chrome || command -v chromium || command -v chromium-browser)"
           test -n "$CHROME"
           npm install --no-save --no-package-lock playwright@1.55.0
+          git fetch --no-tags --depth=1 origin 73c580a018fa78a7f60550ea47fb746bb630e320
+          CHROME="$CHROME" BASE_URL="http://127.0.0.1:8080" node scripts/check_label_parity.cjs
           CHROME="$CHROME" BASE_URL="http://127.0.0.1:8080" node scripts/check_static_content.cjs
           CHROME="$CHROME" BASE_URL="http://127.0.0.1:8080" node scripts/browser_screenshots.mjs
 
