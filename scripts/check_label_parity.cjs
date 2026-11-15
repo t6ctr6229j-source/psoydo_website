@@ -48,14 +48,15 @@ const capture = () => [...document.querySelectorAll('body *')].map(el=>{
     results.push(await page.evaluate(capture));await context.close();
    }
    const [old,now]=results;assert.equal(now.length,old.length,name+' element count');
-   let labels=0;
+   let labels=0; const differences=[];
    for(let i=0;i<old.length;i++){
     assert.equal(now[i].text,old[i].text,name+' text '+i);
     if(now[i].label){labels++;assert.equal(old[i].tag,now[i].label.toUpperCase());}
     else assert.equal(now[i].tag,old[i].tag,name+' tag '+i);
-    assert.deepEqual(now[i].style,old[i].style,name+' '+width+' style '+i+' '+JSON.stringify(now[i]));
-    assert.deepEqual(now[i].rect,old[i].rect,name+' '+width+' geometry '+i+' '+JSON.stringify(now[i]));
+    if(JSON.stringify(now[i].style)!==JSON.stringify(old[i].style))differences.push({i,kind:'style',old:old[i],now:now[i]});
+    if(JSON.stringify(now[i].rect)!==JSON.stringify(old[i].rect))differences.push({i,kind:'geometry',old:old[i],now:now[i]});
    }
+   if(differences.length){console.error(JSON.stringify({name,width,differences},null,2));throw new Error('Visual parity mismatch: '+name+' '+width);}
    assert.ok(labels>0);console.log('Semantic label parity PASS',name,width,labels+' labels',now.length+' elements');
   }
  } finally {await browser.close();}
