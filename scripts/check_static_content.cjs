@@ -17,10 +17,25 @@ const assert = require('node:assert/strict');
         const h1 = page.locator('main h1');
         assert.equal(await h1.count(), 1, file);
         assert(await h1.isVisible(), `${file}: heading requires JavaScript`);
-        const content = await page.locator('main').innerText();
+        // content-visibility:auto intentionally skips offscreen layout. Reading
+        // main.innerText before scrolling can omit valid static sections in
+        // Chromium. Inspect rendered text as a reader reaches each block,
+        // without enabling page scripts or overriding production CSS.
+        const renderedBlocks = [];
+        for (const block of await page.locator('main > *').all()) {
+          await block.scrollIntoViewIfNeeded();
+          renderedBlocks.push(await block.innerText());
+        }
+        const content = renderedBlocks.join('\n');
         assert(content.length > 500, `${file}: main content absent without JavaScript`);
         for (const heading of await page.locator('main h2').all()) {
+          await heading.scrollIntoViewIfNeeded();
           assert(await heading.isVisible(), `${file}: section heading hidden without JavaScript: ${await heading.textContent()}`);
+        }
+        if (file === 'preise.html') {
+          for (const label of ['990 €', '9.900 €', '24.900 €', '49.900 €', 'Vor dem Pilotstart']) {
+            assert(content.toLowerCase().includes(label.toLowerCase()), `${file}: static pricing content missing: ${label}`);
+          }
         }
         const navigation = page.locator('footer a[href]').filter({ hasText: /Produkt|Technologie|Architektur|Use Cases|Sicherheit|Preise|Insights/ });
         assert(await navigation.count() >= 4, `${file}: navigation absent`);
