@@ -1,3 +1,24 @@
+// Keep the fixed contact actions clear of the inquiry form, including its iframe.
+(function(){
+  var dock=document.querySelector('.contact-dock');
+  var form=document.getElementById('register');
+  if(!dock||!form)return;
+  function updateContactDock(){
+    var bounds=form.getBoundingClientRect();
+    document.body.classList.toggle('contact-form-visible',bounds.top<window.innerHeight&&bounds.bottom>0);
+  }
+  if('IntersectionObserver' in window){
+    var observer=new IntersectionObserver(function(entries){
+      document.body.classList.toggle('contact-form-visible',entries[0].isIntersecting);
+    });
+    observer.observe(form);
+  }else{
+    window.addEventListener('scroll',updateContactDock,{passive:true});
+    window.addEventListener('resize',updateContactDock);
+  }
+  updateContactDock();
+})();
+
 (function(){
   try{if(new URLSearchParams(window.location.search).get('qa')==='fullpage')document.documentElement.classList.add('qa-fullpage');}catch(error){}
 

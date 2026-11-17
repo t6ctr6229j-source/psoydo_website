@@ -1,3 +1,4 @@
+import { checkContactDock } from './check_contact_dock.mjs';
 import { chromium } from 'playwright';
 import { checkErrorPage } from './check_error_page.mjs';
 import { checkMeasurement } from './check_measurement.mjs';
@@ -432,4 +433,5 @@ await checkErrorPage(browser);
 await checkRegistration(browser);
 await checkMotion(browser);
 await checkMeasurement(browser);
+await checkContactDock(browser, base);
 await browser.close();
