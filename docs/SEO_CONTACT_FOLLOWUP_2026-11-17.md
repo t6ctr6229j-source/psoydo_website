@@ -20,3 +20,5 @@ Statisch: qa_site.py, check_seo.py, check_authorship.py, JavaScript-Syntax, 16 C
 Lokal bekannte Systembeschränkungen für Chromium/Pages-Runtime; reale Laufzeitchecks und Screenshots laufen in GitHub CI. Finale CI-, Sichtprüfungs-, Merge- und Veröffentlichungsnachweise werden im PR dokumentiert.
 
 Ausgangspunkt Seobility-Crawl 16297939: gesamt 98, Technik 99, Struktur 98, Inhalt 96. Toolmeldungen sind Hinweise; weder 100% noch Rankingwirkung zugesagt. Bestehende Datenschutzkontrollen, Preise und Produktfunktionen bleiben erhalten.
+
+Sitemap-Nachprüfung: lastmod der zehn am 17.11. redaktionell geänderten Seiten aus PR51, PR52 und diesem Paket auf 2026-11-17 korrigiert: Produkt, Anwendungsfälle, Insights, KI-Datenfreigabe, KI-Vertragsanalyse, personenbezogene Daten, PDF-Vorbereitung, Anonymisierung/Pseudonymisierung, On-Premises/Private Cloud und Preise. Reine gemeinsame Kontaktleistenänderungen setzen die übrigen redaktionellen Datumswerte nicht pauschal neu. Artikel-Veröffentlichungsdaten unverändert.
