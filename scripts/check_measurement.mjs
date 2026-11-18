@@ -71,6 +71,19 @@ export async function checkMeasurement(browser){
   await clickContact(page);await clickContact(page,'email');
   rows=await commands();
   assert.deepEqual(rows.filter(x=>x[1]==='psoydo_contact_intent').map(x=>x[2]),['phone','email'].map(method=>({send_to:GA,event_category:'contact_intent',method,placement:'sticky'})));
+  for(const method of ['phone','email']){
+   await page.locator('#erstgespraech [data-contact-method="'+method+'"]').evaluate(el=>{
+    el.addEventListener('click',e=>e.preventDefault(),{once:true});el.click();
+   });
+  }
+  const countBeforeInvalid=(await commands()).filter(x=>x[0]==='event').length;
+  await page.evaluate(()=>{
+   window.__psoydoTrack('psoydo_contact_intent',{method:'private@example.test',placement:'sticky'});
+   window.__psoydoTrack('psoydo_contact_intent',{method:'email',placement:'private@example.test'});
+  });
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,countBeforeInvalid);
+  assert.deepEqual((await commands()).filter(x=>x[1]==='psoydo_contact_intent'&&x[2].placement==='first_conversation').map(x=>x[2]),['phone','email'].map(method=>({send_to:GA,event_category:'contact_intent',method,placement:'first_conversation'})));
+  rows=await commands();
   assert.equal(google,1);
   assert.deepEqual(rows.filter(x=>x[0]==='config').map(x=>x[1]),[GA]);
   assert.equal(rows.find(x=>x[0]==='config'&&x[1]===GA)[2].send_page_view,true);
