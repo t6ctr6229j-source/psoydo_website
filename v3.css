@@ -4766,3 +4766,9 @@ body.contact-form-visible .contact-dock{display:none}
 
 #erstgespraech{scroll-margin-top:95px}
 #erstgespraech .sub-cta-actions .text-link{white-space:normal}
+#erstgespraech{background:#5df5b8;color:#071d22}
+#erstgespraech .sub-cta-grid{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:center}
+#erstgespraech .sub-cta-actions{flex-direction:column;align-items:flex-start}
+#erstgespraech .button{background:#071d22;color:#f5f2eb;white-space:normal}
+#erstgespraech .text-link{color:#071d22;border-color:#071d224d}
+@media(max-width:980px){#erstgespraech .sub-cta-grid{grid-template-columns:1fr}}
