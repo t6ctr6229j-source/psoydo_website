@@ -208,3 +208,11 @@ The gate stays OPEN. Code/content quality, static QA, automated browser renderin
 - Added production routing, three industry articles, deeper existing core articles/Legal content, coherent publisher and net-pilot schema, visible provider contact and discovery links.
 - Added semantic SEO checks and real Apache routing tests; expanded browser coverage to 21 pages. No app.js or legal-main regression.
 - Source review and rich-result eligibility limitations documented in docs/SEO_RELEASE_2026-09-29.md. Pending PR/CI and deployment at this checkpoint.
+
+## Conversion follow-up — 2026-11-18
+
+Fresh branch from main afe95fb5, draft PR only; no merge/deployment authorized for this iteration. Separate first-conversation phone/email route from the paid EUR 990 / 30-day SaaS evaluation, with customer-hosted annual-license production explained at the decision. Product example and use-case CTAs lead to the conversation section; Tally remains an explicit pilot-form click.
+
+Sticky contact actions on all 25 content pages emit psoydo_contact_intent only on production HTTPS origins with Analytics consent. Allowlisted method/placement only; no contact targets, labels, form values or URL queries. Consent changes never install listeners; discarded events are not queued. This is contact intent, not a confirmed lead. Existing psoydo_pilot_form_submitted and generate_lead represent the same submission: reporting must count generate_lead only for leads, never sum both. Tally validation and submission deduplication remain unchanged.
+
+Static QA, SEO, authorship, JS syntax, isolated consent lifecycle and release reference/checksum checks passed. Local Chromium cannot launch (socket() failed: Operation not permitted); extended 390/1440px registration and mocked-measurement tests run in PR CI. Mock events cannot verify real GA4 ingestion. Final CI and screenshot evidence belongs in the PR. No percentage uplift promised; no pricing or product feature changes.

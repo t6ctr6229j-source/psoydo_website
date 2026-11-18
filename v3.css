@@ -4763,3 +4763,6 @@ body:has(.mobile-menu.open) .contact-dock,
 body.lightbox-open .contact-dock,
 body.contact-form-visible .contact-dock{display:none}
 @media(max-width:760px){.contact-dock{left:12px;right:12px;bottom:calc(8px + env(safe-area-inset-bottom,0px))}.contact-dock a{flex:1;padding:10px 12px}}
+
+#erstgespraech{scroll-margin-top:95px}
+#erstgespraech .sub-cta-actions .text-link{white-space:normal}

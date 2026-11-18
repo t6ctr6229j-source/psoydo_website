@@ -83,7 +83,29 @@ export async function checkRegistration(browser) {
         assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
         assert.equal(await page.locator('#pilot-tally-direct').isHidden(),true);
         assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'false');
+        await page.locator('#pilot-tally-open').click();
+        assert.equal(await page.locator('#pilot-tally-frame iframe').count(),1);
+        await page.locator('#pilot-tally-close').click();
+        assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
       }
+      const conversation=page.locator('#erstgespraech');
+      assert.match(await conversation.innerText(),/990 € netto/);
+      assert.match(await conversation.innerText(),/SaaS-Demoumgebung/);
+      assert.match(await conversation.innerText(),/eigenen Laptops oder Servern/);
+      await conversation.scrollIntoViewIfNeeded();
+      await page.screenshot({path:`/tmp/psoydo-browser-qa/first-conversation-${width}-${javaScriptEnabled}.png`});
+      for(const route of ['produkt','anwendungsfaelle','preise']){
+        await page.goto('https://psoydo.com/de/'+route);
+        if(javaScriptEnabled){
+          await page.locator('a[href="./#erstgespraech"]').first().click();
+          await page.waitForURL('**/de/#erstgespraech');
+          assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0,'CTA navigation never loads Tally');
+          const b=await page.locator('#erstgespraech').boundingBox();assert(b&&b.y<900&&b.y+b.height>0);
+        }else assert.equal(await page.locator('a[href="./#erstgespraech"]').count()>0,true);
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
+      }
+      await page.goto('https://psoydo.com/de/');
+      await page.locator('#register').scrollIntoViewIfNeeded();
       await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-contact-${width}-${javaScriptEnabled}.png`});
       await context.close();
     }
