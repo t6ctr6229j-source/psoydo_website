@@ -56,7 +56,7 @@ export async function checkMeasurement(browser){
   await page.locator('#pilot-tally-close').click();
   assert.equal((await commands()).filter(x=>x[0]==='event').length,0);
   assert.equal(google,0,'Declined consent must not load Google or send events');
-  await page.reload();
+  // Keep the same document to verify that a declined submission cannot be replayed after consent.
   assert.equal(await page.locator('#consent').getAttribute('aria-hidden'),'true');
   await page.locator('#consent-reopen').click();
   await page.locator('#consent-analytics').check();
@@ -96,19 +96,26 @@ export async function checkMeasurement(browser){
   assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_pilot_email_click').length,1);
   assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_registration_submit').length,0);
   await page.locator('#pilot-tally-open').click();
+  assert.equal((await commands()).filter(x=>x[1]==='generate_lead').length,0,'Clicks and opening are not submissions');
+  await submitMessage(page,'qa-declined-submission');
+  await page.evaluate(()=>window.__psoydoTrack('psoydo_pilot_form_submitted'));
   await submitMessage(page,'qa-wrong-origin',{origin:'https://untrusted.example'});
   await submitMessage(page,'qa-wrong-source',{wrongSource:true});
   await submitMessage(page,'qa-wrong-form',{formId:'wrong'});
   await submitMessage(page,'');
   assert.equal((await commands()).filter(x=>x[0]==='event'&&x[1]==='generate_lead').length,0);
+  const beforeSubmit=(await commands()).filter(x=>x[0]==='event').length;
   await submitMessage(page,'qa-submission-a');
+  assert.deepEqual((await commands()).filter(x=>x[0]==='event').slice(beforeSubmit).map(x=>x[1]),['generate_lead']);
+  await submitMessage(page,'qa-submission-a');
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,beforeSubmit+1,'Duplicate adds no event');
   await submitMessage(page,'qa-submission-b');
   await submitMessage(page,'qa-submission-a');
   await submitMessage(page,'qa-submission-b');
   rows=await commands();
   assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='generate_lead').length,2,
    'Distinct confirmed submissions count once; replays never create another lead');
-  assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_pilot_form_submitted').length,2);
+  assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_pilot_form_submitted').length,0);
   assert.equal(rows.find(x=>x[0]==='event'&&x[1]==='generate_lead')[2].lead_source,'pilot_form');
   assert.equal(rows.find(x=>x[0]==='event'&&x[1]==='generate_lead')[2].form_id,'KppMYg');
   assert.equal(rows.find(x=>x[0]==='event'&&x[1]==='generate_lead')[2].method,'tally');
@@ -125,6 +132,10 @@ export async function checkMeasurement(browser){
   assert.equal(await page.evaluate(id=>window['ga-disable-'+id],GA),true);
   await clickContact(page);await clickContact(page,'email');
   assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Withdrawal discards contact events');
+  await page.locator('#pilot-tally-open').click();
+  await submitMessage(page,'qa-withdrawn-submission');
+  await page.locator('#pilot-tally-close').click();
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Withdrawal blocks submissions');
   // Ads-only consent must not configure Analytics.
   await page.locator('#consent-reopen').click();
   await page.locator('#consent-ads').check();
@@ -135,6 +146,10 @@ export async function checkMeasurement(browser){
   assert.equal(rows.find(x=>x[0]==='consent')[2].analytics_storage,'denied');
   await clickContact(page);
   assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Ads-only cannot measure contact intent');
+  await page.locator('#pilot-tally-open').click();
+  await submitMessage(page,'qa-ads-only-submission');
+  await page.locator('#pilot-tally-close').click();
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Ads-only blocks submissions');
   // Grant both after an earlier denial; new document must restore consent correctly.
   await page.locator('#consent-reopen').click();
   await page.locator('#consent-analytics').check();
@@ -143,6 +158,7 @@ export async function checkMeasurement(browser){
   rows=await commands();
   assert.deepEqual(rows.filter(x=>x[0]==='config').map(x=>x[1]),[GA,'AW-18355213487']);
   assert.equal(rows.find(x=>x[0]==='consent')[2].analytics_storage,'granted');
+  assert.equal(rows.filter(x=>x[0]==='event').length,0,'No submission replay on re-grant');
   // Repeated consent and document navigation must not duplicate contact listeners.
   await page.locator('#consent-reopen').click();await page.locator('#consent-accept').click();
   for(const file of readdirSync(fileURLToPath(new URL('de/',root))).filter(x=>x.endsWith('.html'))){

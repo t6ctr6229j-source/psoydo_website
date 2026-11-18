@@ -1,6 +1,6 @@
 # Website measurement
 
-Updated 2026-11-04. This describes the explicit website integration, not a verified Google account configuration or confirmed report receipt.
+Updated 2026-11-18. This describes the explicit website integration, not a verified Google account configuration or confirmed report receipt.
 
 ## Configuration
 
@@ -19,18 +19,20 @@ Updated 2026-11-04. This describes the explicit website integration, not a verif
 | `page_view` | One GA configuration per document with `send_page_view: true`, after analytics consent | GA4 |
 | `psoydo_pilot_form_open` | Visitor opens the Tally pilot form | GA4 after analytics consent |
 | `psoydo_pilot_email_click` | Visitor clicks the pilot email link; this does not prove an email was sent | GA4 after analytics consent |
-| `psoydo_pilot_form_submitted` | Validated `Tally.FormSubmitted` from the active form iframe; diagnostic completion event | GA4 after analytics consent |
-| `generate_lead` | The same confirmed completion; once per distinct submission in the current document | GA4 after analytics consent; intended primary lead key event |
+| `psoydo_contact_intent` | Phone/email activation; allowlisted method and placement, not a lead | GA4 after analytics consent |
+| `generate_lead` | Validated Tally.FormSubmitted from the active iframe; sole submission event, once per distinct submission in the current document | GA4 after analytics consent; intended primary lead key event |
 
-Only `generate_lead` should be configured as the primary lead key event. Do not count the diagnostic completion event as a second conversion for the same lead. No lead is inferred from a click, iframe load or form opening. No Ads conversion is asserted by this integration.
+`generate_lead` is the only explicit submission event. The legacy `psoydo_pilot_form_submitted` call and allowlist entry have been removed. A submission means an incoming form, not a qualified customer or sale. This removes the code-side double-counting risk; it does not imply that any actual GA4 configuration previously counted twice. No lead is inferred from a click, iframe load or form opening. No Ads conversion is asserted by this integration.
 
 The Tally handler requires origin `https://tally.so`, the active iframe window, form ID `KppMYg` and a nonempty string submission ID. Submission IDs stay in a document-local set for replay protection; they are not persisted or sent to analytics. Confirmations received without consent are not sent retrospectively.
 
-Events contain only fixed category and label values. `generate_lead` adds fixed `lead_source: pilot_form`, `form_id: KppMYg` and `method: tally`. There is no fictional monetary value. Answers, response/submission IDs, respondent IDs, names, email addresses and uploaded content are never copied into these events.
+Events contain only fixed category/label or allowlisted method/placement values. `generate_lead` adds fixed `lead_source: pilot_form`, `form_id: KppMYg` and `method: tally`. There is no fictional monetary value. Answers, response/submission IDs, respondent IDs, names, email addresses and uploaded content are never copied into these events.
 
 The configured page URL excludes query strings and fragments. External referrers include only their HTTP(S) origin, without path, query or fragment. Referrers from either Psoydo hostname are omitted to avoid self-referrals.
 
 ## Regression coverage
+
+One valid submission emits exactly one generate_lead and no legacy submit event; duplicate IDs emit nothing. Invalid origin/source/form ID, denial, Ads-only and withdrawal emit no lead. A declined submission replayed after consent in the same document remains discarded. Opening/clicks are micro-events, never leads.
 
 The existing browser suite mocks Google and Tally; it does not send real measurements or submit leads. It covers initial denial, persisted and expired choices, analytics only, Ads only, both, withdrawal, re-grant, old-consent migration, preview/local/HTTP exclusion, external-referrer minimization, validated form message origins/sources/IDs and replay protection at 390/1440px. Static checks confirm the documented ID and source configuration. CI results for the exact release commit are the validation record.
 
@@ -46,7 +48,7 @@ Use the following acceptance record to close the gap through authenticated accou
 | Reception after consent | A controlled production visit appears in the intended property, with the clean page URL | Not yet verified |
 | Filters and DebugView | Data filters, internal/developer traffic handling and report lag explain what is expected in each report | Not yet verified |
 | Confirmed lead | A controlled completion is received exactly once without answer data or submission IDs; test contacts do not enter normal inquiry handling | Not yet verified |
-| Key event | Only `generate_lead` is the primary lead key event; the diagnostic event is not counted again | Not yet verified |
+| Key event | Review the canonical `generate_lead` mapping and historical legacy event settings; code changes do not change account settings | Not yet verified |
 
 Local mocked tests verify the browser's command queue and consent behavior. They must not be reported as Google ingestion evidence. Do not generate real measurements or submit a production inquiry merely to turn an empty report into a nonempty one.
 

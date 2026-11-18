@@ -74,7 +74,7 @@ export async function checkRegistration(browser) {
             source:iframe.contentWindow,data:payload}));
           return captured;
         });
-        assert.deepEqual(events,['psoydo_pilot_form_submitted','generate_lead'],
+        assert.deepEqual(events,['generate_lead'],
           'Only a valid first form submission should be counted, without personal answers');
         assert.equal(await frame.getAttribute('height'),'1120',
           'A verified Tally resize must be honored');

@@ -553,7 +553,6 @@
       // IDs stay in this document only; they and the form answers never reach Google.
       pilotSubmissionIds.add(payload.id);
       if(window.__psoydoTrack){
-        window.__psoydoTrack('psoydo_pilot_form_submitted');
         window.__psoydoTrack('generate_lead');
       }
     });
@@ -702,7 +701,7 @@
     }catch(error){return '';}
   }
 
-  var measurementEvents=['psoydo_pilot_form_open','psoydo_pilot_form_submitted','psoydo_pilot_email_click','psoydo_contact_intent','generate_lead'];
+  var measurementEvents=['psoydo_pilot_form_open','psoydo_pilot_email_click','psoydo_contact_intent','generate_lead'];
   window.__psoydoTrack=function(name,details){
     if(measurementEvents.indexOf(name)===-1)return;
     if(current.expires<=Date.now()){stopMeasurement();return;}
