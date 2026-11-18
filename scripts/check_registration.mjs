@@ -100,7 +100,11 @@ export async function checkRegistration(browser) {
           await page.locator('a[href="./#erstgespraech"]').first().click();
           await page.waitForURL('**/de/#erstgespraech');
           assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0,'CTA navigation never loads Tally');
-          const b=await page.locator('#erstgespraech').boundingBox();assert(b&&b.y<900&&b.y+b.height>0);
+          // URL changes before the browser completes the native anchor scroll.
+          await page.waitForFunction(()=>{
+            const b=document.getElementById('erstgespraech').getBoundingClientRect();
+            return b.top<innerHeight&&b.bottom>0;
+          });
         }else assert.equal(await page.locator('a[href="./#erstgespraech"]').count()>0,true);
         assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
       }
