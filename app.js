@@ -553,11 +553,18 @@
       // IDs stay in this document only; they and the form answers never reach Google.
       pilotSubmissionIds.add(payload.id);
       if(window.__psoydoTrack){
-        window.__psoydoTrack('psoydo_pilot_form_submitted');
         window.__psoydoTrack('generate_lead');
       }
     });
   }
+  // Bind once per document, independently of consent changes. No href or label is collected.
+  document.querySelectorAll('[data-contact-method][data-contact-placement]').forEach(function(link){
+    link.addEventListener('click',function(){
+      if(window.__psoydoTrack)window.__psoydoTrack('psoydo_contact_intent',{
+        method:link.getAttribute('data-contact-method'),placement:link.getAttribute('data-contact-placement')
+      });
+    });
+  });
   var pilotEmail=document.getElementById('pilot-email');
   if(pilotEmail)pilotEmail.addEventListener('click',function(){
     if(window.__psoydoTrack)window.__psoydoTrack('psoydo_pilot_email_click');
@@ -694,13 +701,18 @@
     }catch(error){return '';}
   }
 
-  var measurementEvents=['psoydo_pilot_form_open','psoydo_pilot_form_submitted','psoydo_pilot_email_click','generate_lead'];
-  window.__psoydoTrack=function(name){
+  var measurementEvents=['psoydo_pilot_form_open','psoydo_pilot_email_click','psoydo_contact_intent','generate_lead'];
+  window.__psoydoTrack=function(name,details){
     if(measurementEvents.indexOf(name)===-1)return;
     if(current.expires<=Date.now()){stopMeasurement();return;}
     if(!production||!configured||typeof window.gtag!=='function')return;
     if(current.analytics){
       var parameters={send_to:GA,event_category:'registration',event_label:'pilot_inquiry'};
+      if(name==='psoydo_contact_intent'){
+        if(!details||['phone','email'].indexOf(details.method)===-1||
+           ['sticky','first_conversation'].indexOf(details.placement)===-1)return;
+        parameters={send_to:GA,event_category:'contact_intent',method:details.method,placement:details.placement};
+      }
       if(name==='generate_lead'){
         parameters.lead_source='pilot_form';
         parameters.form_id='KppMYg';

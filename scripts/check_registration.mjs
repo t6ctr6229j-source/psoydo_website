@@ -74,7 +74,7 @@ export async function checkRegistration(browser) {
             source:iframe.contentWindow,data:payload}));
           return captured;
         });
-        assert.deepEqual(events,['psoydo_pilot_form_submitted','generate_lead'],
+        assert.deepEqual(events,['generate_lead'],
           'Only a valid first form submission should be counted, without personal answers');
         assert.equal(await frame.getAttribute('height'),'1120',
           'A verified Tally resize must be honored');
@@ -83,7 +83,33 @@ export async function checkRegistration(browser) {
         assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
         assert.equal(await page.locator('#pilot-tally-direct').isHidden(),true);
         assert.equal(await page.locator('#pilot-tally-open').getAttribute('aria-expanded'),'false');
+        await page.locator('#pilot-tally-open').click();
+        assert.equal(await page.locator('#pilot-tally-frame iframe').count(),1);
+        await page.locator('#pilot-tally-close').click();
+        assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0);
       }
+      const conversation=page.locator('#erstgespraech');
+      assert.match(await conversation.innerText(),/990 € netto/);
+      assert.match(await conversation.innerText(),/SaaS-Demoumgebung/);
+      assert.match(await conversation.innerText(),/eigenen Laptops oder Servern/);
+      await conversation.scrollIntoViewIfNeeded();
+      await page.screenshot({path:`/tmp/psoydo-browser-qa/first-conversation-${width}-${javaScriptEnabled}.png`});
+      for(const route of ['produkt','anwendungsfaelle','preise']){
+        await page.goto('https://psoydo.com/de/'+route);
+        if(javaScriptEnabled){
+          await page.locator('a[href="./#erstgespraech"]').first().click();
+          await page.waitForURL('**/de/#erstgespraech');
+          assert.equal(await page.locator('#pilot-tally-frame iframe').count(),0,'CTA navigation never loads Tally');
+          // URL changes before the browser completes the native anchor scroll.
+          await page.waitForFunction(()=>{
+            const b=document.getElementById('erstgespraech').getBoundingClientRect();
+            return b.top<innerHeight&&b.bottom>0;
+          });
+        }else assert.equal(await page.locator('a[href="./#erstgespraech"]').count()>0,true);
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),true);
+      }
+      await page.goto('https://psoydo.com/de/');
+      await page.locator('#register').scrollIntoViewIfNeeded();
       await page.screenshot({path:`/tmp/psoydo-browser-qa/pilot-contact-${width}-${javaScriptEnabled}.png`});
       await context.close();
     }

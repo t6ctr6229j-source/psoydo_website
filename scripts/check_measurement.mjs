@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import {fileURLToPath} from 'node:url';
+import {readdirSync} from 'node:fs';
 const root=new URL('../',import.meta.url);
 const GA='G-EYFT82SFN7';
 const KEY='psoydo-consent-v3';
@@ -17,6 +18,12 @@ async function submitMessage(page,id,options={}){
    }})
   }));
  },{id,options});
+}
+
+async function clickContact(page,method='phone'){
+ await page.locator('.contact-dock [data-contact-method="'+method+'"]').evaluate(el=>{
+  el.addEventListener('click',e=>e.preventDefault(),{once:true});el.click();
+ });
 }
 
 // Mock Google: validate consent/routing without sending measurements or opening a mail client.
@@ -42,13 +49,14 @@ export async function checkMeasurement(browser){
   assert.equal(await page.locator('#consent-analytics').isChecked(),false);
   assert.equal(await page.locator('#consent-ads').isChecked(),false);
   await page.locator('#consent-decline').click();
+  await clickContact(page);await clickContact(page,'email');
   await page.locator('#pilot-email').evaluate(el=>{el.addEventListener('click',event=>event.preventDefault(),{once:true});el.click();});
   await page.locator('#pilot-tally-open').click();
   await submitMessage(page,'qa-declined-submission');
   await page.locator('#pilot-tally-close').click();
   assert.equal((await commands()).filter(x=>x[0]==='event').length,0);
   assert.equal(google,0,'Declined consent must not load Google or send events');
-  await page.reload();
+  // Keep the same document to verify that a declined submission cannot be replayed after consent.
   assert.equal(await page.locator('#consent').getAttribute('aria-hidden'),'true');
   await page.locator('#consent-reopen').click();
   await page.locator('#consent-analytics').check();
@@ -59,6 +67,23 @@ export async function checkMeasurement(browser){
   await page.locator('#consent-accept').click();
   await page.waitForFunction(()=>window.mockGoogleLoaded);
   let rows=await commands();
+  assert.equal(rows.filter(x=>x[0]==='event').length,0,'Do not replay pre-consent contact intent');
+  await clickContact(page);await clickContact(page,'email');
+  rows=await commands();
+  assert.deepEqual(rows.filter(x=>x[1]==='psoydo_contact_intent').map(x=>x[2]),['phone','email'].map(method=>({send_to:GA,event_category:'contact_intent',method,placement:'sticky'})));
+  for(const method of ['phone','email']){
+   await page.locator('#erstgespraech [data-contact-method="'+method+'"]').evaluate(el=>{
+    el.addEventListener('click',e=>e.preventDefault(),{once:true});el.click();
+   });
+  }
+  const countBeforeInvalid=(await commands()).filter(x=>x[0]==='event').length;
+  await page.evaluate(()=>{
+   window.__psoydoTrack('psoydo_contact_intent',{method:'private@example.test',placement:'sticky'});
+   window.__psoydoTrack('psoydo_contact_intent',{method:'email',placement:'private@example.test'});
+  });
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,countBeforeInvalid);
+  assert.deepEqual((await commands()).filter(x=>x[1]==='psoydo_contact_intent'&&x[2].placement==='first_conversation').map(x=>x[2]),['phone','email'].map(method=>({send_to:GA,event_category:'contact_intent',method,placement:'first_conversation'})));
+  rows=await commands();
   assert.equal(google,1);
   assert.deepEqual(rows.filter(x=>x[0]==='config').map(x=>x[1]),[GA]);
   assert.equal(rows.find(x=>x[0]==='config'&&x[1]===GA)[2].send_page_view,true);
@@ -71,19 +96,26 @@ export async function checkMeasurement(browser){
   assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_pilot_email_click').length,1);
   assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_registration_submit').length,0);
   await page.locator('#pilot-tally-open').click();
+  assert.equal((await commands()).filter(x=>x[1]==='generate_lead').length,0,'Clicks and opening are not submissions');
+  await submitMessage(page,'qa-declined-submission');
+  await page.evaluate(()=>window.__psoydoTrack('psoydo_pilot_form_submitted'));
   await submitMessage(page,'qa-wrong-origin',{origin:'https://untrusted.example'});
   await submitMessage(page,'qa-wrong-source',{wrongSource:true});
   await submitMessage(page,'qa-wrong-form',{formId:'wrong'});
   await submitMessage(page,'');
   assert.equal((await commands()).filter(x=>x[0]==='event'&&x[1]==='generate_lead').length,0);
+  const beforeSubmit=(await commands()).filter(x=>x[0]==='event').length;
   await submitMessage(page,'qa-submission-a');
+  assert.deepEqual((await commands()).filter(x=>x[0]==='event').slice(beforeSubmit).map(x=>x[1]),['generate_lead']);
+  await submitMessage(page,'qa-submission-a');
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,beforeSubmit+1,'Duplicate adds no event');
   await submitMessage(page,'qa-submission-b');
   await submitMessage(page,'qa-submission-a');
   await submitMessage(page,'qa-submission-b');
   rows=await commands();
   assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='generate_lead').length,2,
    'Distinct confirmed submissions count once; replays never create another lead');
-  assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_pilot_form_submitted').length,2);
+  assert.equal(rows.filter(x=>x[0]==='event'&&x[1]==='psoydo_pilot_form_submitted').length,0);
   assert.equal(rows.find(x=>x[0]==='event'&&x[1]==='generate_lead')[2].lead_source,'pilot_form');
   assert.equal(rows.find(x=>x[0]==='event'&&x[1]==='generate_lead')[2].form_id,'KppMYg');
   assert.equal(rows.find(x=>x[0]==='event'&&x[1]==='generate_lead')[2].method,'tally');
@@ -98,6 +130,12 @@ export async function checkMeasurement(browser){
   assert.equal(google,1,'Withdrawal must reload without requesting Google again');
   assert.equal((await context.cookies()).filter(c=>c.name==='_ga').length,0);
   assert.equal(await page.evaluate(id=>window['ga-disable-'+id],GA),true);
+  await clickContact(page);await clickContact(page,'email');
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Withdrawal discards contact events');
+  await page.locator('#pilot-tally-open').click();
+  await submitMessage(page,'qa-withdrawn-submission');
+  await page.locator('#pilot-tally-close').click();
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Withdrawal blocks submissions');
   // Ads-only consent must not configure Analytics.
   await page.locator('#consent-reopen').click();
   await page.locator('#consent-ads').check();
@@ -106,6 +144,12 @@ export async function checkMeasurement(browser){
   rows=await commands();
   assert.deepEqual(rows.filter(x=>x[0]==='config').map(x=>x[1]),['AW-18355213487']);
   assert.equal(rows.find(x=>x[0]==='consent')[2].analytics_storage,'denied');
+  await clickContact(page);
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Ads-only cannot measure contact intent');
+  await page.locator('#pilot-tally-open').click();
+  await submitMessage(page,'qa-ads-only-submission');
+  await page.locator('#pilot-tally-close').click();
+  assert.equal((await commands()).filter(x=>x[0]==='event').length,0,'Ads-only blocks submissions');
   // Grant both after an earlier denial; new document must restore consent correctly.
   await page.locator('#consent-reopen').click();
   await page.locator('#consent-analytics').check();
@@ -114,6 +158,17 @@ export async function checkMeasurement(browser){
   rows=await commands();
   assert.deepEqual(rows.filter(x=>x[0]==='config').map(x=>x[1]),[GA,'AW-18355213487']);
   assert.equal(rows.find(x=>x[0]==='consent')[2].analytics_storage,'granted');
+  assert.equal(rows.filter(x=>x[0]==='event').length,0,'No submission replay on re-grant');
+  // Repeated consent and document navigation must not duplicate contact listeners.
+  await page.locator('#consent-reopen').click();await page.locator('#consent-accept').click();
+  for(const file of readdirSync(fileURLToPath(new URL('de/',root))).filter(x=>x.endsWith('.html'))){
+   await page.goto('https://psoydo.com/de/'+file);
+   await clickContact(page);await clickContact(page,'email');
+   const contact=(await commands()).filter(x=>x[1]==='psoydo_contact_intent');
+   assert.equal(contact.length,2,file+' one event per contact activation');
+   assert.deepEqual(contact.map(x=>x[2]),['phone','email'].map(method=>({send_to:GA,event_category:'contact_intent',method,placement:'sticky'})));
+   assert.equal((await commands()).filter(x=>x[1]==='generate_lead').length,0);
+  }
   await page.goto('https://psoydo.com/de/insights');
   await page.waitForFunction(()=>window.mockGoogleLoaded);
   assert.equal(await page.locator('#consent-reopen').count(),1);
@@ -132,6 +187,8 @@ export async function checkMeasurement(browser){
     'Measurement fixture must retain the requested origin (browser HTTPS upgrades change the case under test)');
    await page.locator('#consent.show').waitFor();
    await page.locator('#consent-analytics').check();await page.locator('#consent-accept').click();
+   await clickContact(page);await clickContact(page,'email');
+   assert.equal((await commands()).filter(x=>x[0]==='event').length,0);
    assert.equal(google,beforeOld,'Non-production origins must not start measurement: '+origin);
   }
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
