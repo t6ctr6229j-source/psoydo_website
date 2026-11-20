@@ -19,6 +19,12 @@ This section supersedes the historical snapshot below. PR #2 is closed and unmer
 - GitHub Actions confirms successful Pages deployment of 425c393 after the rename (run 35709304078, 2026-09-22 09:15 UTC).
 - The SEO PR's Website QA run 35704309312 succeeded. Historical Lighthouse numbers below are not a fresh measurement.
 
+## 2026-11-20: Seobility corrections (draft, not released)
+
+Corrected the homepage application graph (inline typed pilot offer, no out-of-domain software brand property), made the organization explicit for all 14 article publishers, and clarified the body introductions on the three flagged pages. This maintains the existing price, seller, evaluation scope, author identity and deployment claims. The Insights heading hierarchy is intentional (categorized cards); the heading-count hint is not a markup defect. The EUR-Lex link is unchanged because a crawler 202 response does not establish a broken link.
+
+The SEO check now asserts the app/pilot and publisher relationships. Re-crawl Seobility after an authorized release; these source changes do not establish a new production score or ranking.
+
 ## Current bounded repair
 
 The custom 404 previously resolved styles/images relative to the missing URL and linked to /de/, outside a GitHub project site. It now resolves assets and home links from the GitHub project prefix or custom-domain root and uses the official optimized logo. A browser regression exercises nested missing URLs under both hosting layouts at desktop/mobile widths, including keyboard recovery and the home link.

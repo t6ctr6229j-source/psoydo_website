@@ -35,6 +35,7 @@ for page in sorted((ROOT/'de').glob('*.html')):
     graph=json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>',text,re.S)[1])['@graph']
     ids=[n['@id'] for n in graph if '@id' in n]
     assert len(ids)==len(set(ids)), (page.name,'duplicate entity')
+    offers_to_check = [node for node in graph if node.get('@type') == 'Offer']
     for node in graph:
         if node.get('@type') in ['WebPage','Article','CollectionPage']:
             if node.get('description'):
@@ -50,12 +51,19 @@ for page in sorted((ROOT/'de').glob('*.html')):
             assert node['telephone']=='+49 731 40 32 13 75'
         if node.get('@type')=='SoftwareApplication':
             assert node.get('provider',{}).get('@id')=='https://wescaleit.com/#organization'
-            assert node.get('brand',{}).get('@id')=='https://wescaleit.com/#brand-psoydo'
-        if node.get('@type')=='Offer':
-            assert node['price']=='990' and node['priceCurrency']=='EUR'
-            assert node['priceSpecification']['valueAddedTaxIncluded'] is False
-            assert node['eligibleDuration']['value']==30
-            assert 'Keine automatische Verlängerung' in node['description']
+            # SoftwareApplication is a CreativeWork; brand is not a property of that type.
+            assert 'brand' not in node, (page.name, 'unsupported software brand property')
+            offer = node.get('offers', {})
+            assert offer.get('@type') == 'Offer' and offer.get('@id') == 'https://psoydo.com/#pilot', (page.name, 'pilot offer must be typed inline')
+            offers_to_check.append(offer)
+        if node.get('@type')=='Article':
+            publisher = node.get('publisher', {})
+            assert publisher == {
+                '@type': 'Organization',
+                '@id': 'https://wescaleit.com/#organization',
+                'name': 'wescaleIT AG',
+                'url': 'https://wescaleit.com/',
+            }, (page.name, 'article publisher must identify a typed organization')
         if node.get('@type')=='Article' and 'dateModified' in node:
             assert f'datetime="{node["dateModified"]}"' in text
             assert f'datetime="{node["datePublished"]}"' in text
@@ -68,10 +76,17 @@ for page in sorted((ROOT/'de').glob('*.html')):
                 a=' '.join(plain(p) for p in re.findall('<p>(.*?)</p>',detail,re.S))
                 visible.append((q,a))
             assert visible==[(q['name'],q['acceptedAnswer']['text']) for q in node['mainEntity']], 'FAQ drift'
-        if node.get('@id') and node.get('@type') in ['Organization','Offer']:
-            old=entities.setdefault(node['@id'],node)
-            # itemOffered may be explicitly present only on the pricing page.
-            assert {k:v for k,v in old.items() if k!='itemOffered'}=={k:v for k,v in node.items() if k!='itemOffered'}, 'Entity disagreement'
+        if node.get('@id') and node.get('@type') == 'Organization':
+            old = entities.setdefault(node['@id'], node)
+            assert old == node, 'Organization entity disagreement'
+    for offer in offers_to_check:
+        assert offer['price']=='990' and offer['priceCurrency']=='EUR'
+        assert offer['priceSpecification']['valueAddedTaxIncluded'] is False
+        assert offer['eligibleDuration']['value']==30
+        assert 'Keine automatische Verlängerung' in offer['description']
+        old = entities.setdefault(offer['@id'], offer)
+        # itemOffered may be explicitly present only on the pricing page.
+        assert {k:v for k,v in old.items() if k!='itemOffered'} == {k:v for k,v in offer.items() if k!='itemOffered'}, 'Offer entity disagreement'
     assert 'tel:+4973140321375' in text and 'mailto:info@wescaleit.com' in text
     if page.stem not in ['datenschutz','impressum']:
         assert not re.search('[—–]',plain(text)), (page.name,'editorial dash')
